@@ -1,15 +1,17 @@
 # Analyse des données
+## Description des champs :
+ cf. https://data.arcep.fr/mobile/sites/
 ## Chiffres sur les stations de base :
 ### Chiffres généraux :
 |||
-|---|---|
+|---|---:|
 | Stations de base | 108838 | 
 | Stations de base/région (moyenne) | 8372 |
 | Stations de base/département (moyenne) | 1134 |
 | Stations de base/ville (moyenne) | 6 |
 ### Stations par opérateurs :
 |Opérateur|Nb de stations|
-|---|---|
+|---|---:|
 | Bouygues Telecom | 26331 | 
 | Free Mobile | 25949 | 
 | Orange | 30540 | 
@@ -131,7 +133,7 @@
 | Yvelines                |           332 |   353 |      401 |                401 |    1487 |
 ### Type de réseau :
 |Type de réseau|Nb de stations|
-|---|---|
+|---|---:|
 | 2g | 60638 | 
 | 3g | 107753 | 
 | 4g | 108399 | 
