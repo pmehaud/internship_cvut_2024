@@ -6,6 +6,7 @@ from sklearn.cluster import DBSCAN
 import tkinter as tk
 from scipy.spatial import Voronoi, Delaunay
 import numpy as np
+from functools import partial
 
 ctk.set_default_color_theme("dark-blue")
 
@@ -18,9 +19,6 @@ regions = df['nom_reg'].unique()
 
 # Default map location
 location = [45.5, 4.5]
-
-dbscan = DBSCAN(eps=0.03, min_samples=15).fit(df[['longitude', 'latitude']])
-operatorCityLabels = dbscan.labels_
 
 def colorFromOp(ind, lat, lon, num, op):
     match op:
@@ -36,7 +34,7 @@ def colorFromOp(ind, lat, lon, num, op):
             print(f"couleur associée à l'opérateur {op} non trouvé")
             return '000000'
 
-def colorFromCity(ind, lat, lon, num, op):
+def colorFromCity(ind, lat, lon, num, op, operatorCityLabels):
     return 'green' if ( operatorCityLabels[ind] == -1) else 'blue'
 
 def getPopUp(lat, lon, num, op):
@@ -119,9 +117,11 @@ def plotMap():
             delauney = False
             voronoi = False
         elif selected_option == "Villes":
+            dbscan = DBSCAN(eps=float(epsilon_entry.get()), min_samples=int(n_min_entry.get())).fit(df[['longitude', 'latitude']])
+            operatorCityLabels = dbscan.labels_
             labels = ['Ville', 'Campagne']
             colors = ["blue", "green"]
-            couleurFonction = colorFromCity
+            couleurFonction = partial(colorFromCity, operatorCityLabels=operatorCityLabels)
             popupFonction = getPopUp
             delauney = False
             voronoi = False
@@ -158,53 +158,101 @@ def select_all(variables, select_all_state):
 window = ctk.CTk()
 window.minsize(1400, 1000)  # Taille minimale de la fenêtre
 window.maxsize(2500, 1500)  # Taille maximale de la fenêtre
+window.title("Visualisator 3000")
 window.grid_rowconfigure(0, weight=1)  # Centrer verticalement
 window.grid_columnconfigure(0, weight=1)  # Centrer horizontalement
 
 # Titre
-title_label = ctk.CTkLabel(window, text="Outil d'affichage de carte de stations de bases Françaises", font=("Helvetica", 31, 'bold'), anchor="center", pady=15, padx=20)
-title_label.grid(row=0, column=0, columnspan=3, padx=10, pady=10)
+title_label = ctk.CTkLabel(window, text="Outil de visualisation des stations téléphoniques française", font=("Helvetica", 31, 'bold'), anchor="center", pady=15, padx=20)
+title_label.grid(row=0, column=0, columnspan=2, padx=10, pady=10)
 
 # Menu déroulant pour les actions
 action_options = ["Opérateurs", "Villes", "Delauney", "Voronoi"]
 action_var = tk.StringVar(window)
 action_var.set(action_options[0])  # Valeur par défaut
 action_combo_box = ctk.CTkComboBox(window, values=action_options, font=("Helvetica", 25), variable=action_var, width=300, height=90, dropdown_font=("Helvetica", 25))
-action_combo_box.grid(row=1, column=0, columnspan=3, padx=10, pady=10)
+action_combo_box.grid(row=1, column=0, columnspan=2, padx=10, pady=10)
 
-# Layout pour les régions et les opérateurs
+# Layout pour les régions, opérateurs et technologies
 selection_frame = ctk.CTkFrame(window)
-selection_frame.grid(row=2, column=0, columnspan=3, padx=10, pady=10)
+selection_frame.grid(row=2, column=0, padx=10, pady=10)
 
 # En tête de colonne pour les régions avec case à cocher pour sélectionner toute la colonne
 region_label = ctk.CTkLabel(selection_frame, text="Régions:", font=("Helvetica", 30, 'bold'), anchor="center")
-region_label.grid(row=0, column=0, sticky="w", pady=20, padx=10)
+region_label.grid(row=0, column=0, sticky="w", pady=20, padx=35)
 region_select_all_var = tk.BooleanVar()
 region_select_all_checkbox = ctk.CTkCheckBox(selection_frame, text="Tout sélectionner", font=("Helvetica", 20), variable=region_select_all_var, command=lambda: select_all(region_vars, region_select_all_var.get()))
 region_select_all_checkbox.grid(row=0, column=1, sticky="w", pady=20, padx=10)
 
 # ComboBox pour les régions avec case à cocher
 region_vars = [tk.IntVar() for _ in range(len(regions))]
-region_checkboxes = [ctk.CTkCheckBox(selection_frame, text=region, font=("Helvetica", 25), variable=region_vars[i]) for i, region in enumerate(regions)]
+region_checkboxes = [ctk.CTkCheckBox(selection_frame, text=region, font=("Helvetica", 25), variable=region_vars[i], checkbox_height=40, checkbox_width=40) for i, region in enumerate(regions)]
 for i, checkbox in enumerate(region_checkboxes):
     checkbox.grid(row=i+1, column=0, sticky="w", padx=40, pady=10)
 
 # En tête de colonne pour les opérateurs avec case à cocher pour sélectionner toute la colonne
 operator_label = ctk.CTkLabel(selection_frame, text="Opérateurs:", font=("Helvetica", 30, 'bold'), anchor="center")
-operator_label.grid(row=0, column=2, sticky="w", pady=20, padx=10)
+operator_label.grid(row=0, column=2, sticky="w", pady=20, padx=35)
 operator_select_all_var = tk.BooleanVar()
 operator_select_all_checkbox = ctk.CTkCheckBox(selection_frame, text="Tout sélectionner", font=("Helvetica", 20), variable=operator_select_all_var, command=lambda: select_all(operator_vars, operator_select_all_var.get()))
 operator_select_all_checkbox.grid(row=0, column=3, sticky="w", pady=20, padx=10)
 
 # ComboBox pour les opérateurs avec case à cocher
 operator_vars = [tk.IntVar() for _ in range(len(operators))]
-operator_checkboxes = [ctk.CTkCheckBox(selection_frame, text=operator, font=("Helvetica", 25), variable=operator_vars[i]) for i, operator in enumerate(operators)]
+operator_checkboxes = [ctk.CTkCheckBox(selection_frame, text=operator, font=("Helvetica", 25), variable=operator_vars[i], checkbox_height=40, checkbox_width=40) for i, operator in enumerate(operators)]
 for i, checkbox in enumerate(operator_checkboxes):
     checkbox.grid(row=i+1, column=2, sticky="w", padx=40, pady=10)
 
+# Liste des technologies disponibles
+technologies = ["2G", "3G", "4G", "5G"]
+
+# En tête de colonne pour les technologies avec case à cocher pour sélectionner toute la colonne
+technology_label = ctk.CTkLabel(selection_frame, text="Technologies:", font=("Helvetica", 30, 'bold'), anchor="center")
+technology_label.grid(row=0, column=4, sticky="w", pady=20, padx=35)
+technology_select_all_var = tk.BooleanVar()
+technology_select_all_checkbox = ctk.CTkCheckBox(selection_frame, text="Tout sélectionner", font=("Helvetica", 20), variable=technology_select_all_var, command=lambda: select_all(technology_vars, technology_select_all_var.get()))
+technology_select_all_checkbox.grid(row=0, column=5, sticky="w", pady=20, padx=10)
+
+# Création de variables pour stocker les valeurs sélectionnées de la technologie
+technology_vars = [tk.IntVar() for _ in range(len(technologies))]
+
+# CheckBox pour les technologies
+technology_checkboxes = [ctk.CTkCheckBox(selection_frame, text=tech, font=("Helvetica", 25), variable=technology_vars[i], checkbox_height=40, checkbox_width=40) for i, tech in enumerate(technologies)]
+for i, checkbox in enumerate(technology_checkboxes):
+    checkbox.grid(row=i+1, column=4, sticky="w", padx=40, pady=10)
+
+# Layout pour les paramètres numériques (epsilon et n_min)
+param_frame = ctk.CTkFrame(selection_frame)
+param_frame.grid(row=0, column=6, rowspan=len(operators)+1, padx=10, pady=10)
+
+# Labels et champs de saisie pour epsilon et n_min avec des valeurs par défaut
+epsilon_label = ctk.CTkLabel(param_frame, text="Epsilon:", font=("Helvetica", 25), anchor="center")
+epsilon_label.grid(row=0, column=0, sticky="e", padx=10, pady=10)
+epsilon_entry = ctk.CTkEntry(param_frame, font=("Helvetica", 25), width=100)
+epsilon_entry.grid(row=0, column=1, sticky="w", padx=10, pady=10)
+epsilon_entry.insert(0, "0.03")  # Valeur par défaut pour epsilon
+
+n_min_label = ctk.CTkLabel(param_frame, text="N Min:", font=("Helvetica", 25), anchor="center")
+n_min_label.grid(row=1, column=0, sticky="e", padx=10, pady=10)
+n_min_entry = ctk.CTkEntry(param_frame, font=("Helvetica", 25), width=100)
+n_min_entry.grid(row=1, column=1, sticky="w", padx=10, pady=10)
+n_min_entry.insert(0, "15")  # Valeur par défaut pour n_min
+
+param_frame.grid_forget()
+
+# Fonction pour afficher ou cacher les paramètres en fonction de l'option sélectionnée
+def toggle_params(option):
+    if option == "Villes":
+        param_frame.grid(row=0, column=6, rowspan=len(regions)+1, padx=10, pady=10)
+    else:
+        param_frame.grid_forget()
+
+# Lier la fonction de bascule au changement de sélection dans la liste déroulante
+action_var.trace_add("write", lambda *args: toggle_params(action_var.get()))
+
 # Bouton Afficher
 afficher_button = ctk.CTkButton(window, text="Afficher", font=("Helvetica", 30), command=plotMap, height=120, width=800)
-afficher_button.grid(row=3, column=0, columnspan=3, padx=10, pady=40)
+afficher_button.grid(row=3, column=0, columnspan=2, padx=10, pady=40)
 
 window.update_idletasks()
 window.mainloop()
