@@ -2,3 +2,4 @@ database
 local
 *checkpoints
 *.html
+*.pyc
