@@ -53,7 +53,7 @@ title_label = ctk.CTkLabel(window, text="Outil de visualisation des stations té
 title_label.grid(row=0, column=0, columnspan=2, padx=10, pady=10)
 
 # Menu déroulant pour les actions
-action_options = ["Opérateurs", "Villes", "Technologies", "Delaunay", "Voronoi"]
+action_options = ["Opérateurs", "Technologies", "Villes", "Delaunay", "Voronoi"]
 action_var = tk.StringVar(window)
 action_var.set(action_options[0])  # Valeur par défaut
 action_combo_box = ctk.CTkComboBox(window, values=action_options, font=("Helvetica", 25), variable=action_var, width=200, height=50, dropdown_font=("Helvetica", 25))

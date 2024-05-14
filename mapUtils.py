@@ -38,8 +38,8 @@ def getPointsInfos(data_filtered, option, epsilon, nmin, selected_tech):
     match(option):
         case "Villes":
             dbscan_labels=DBSCAN(eps=epsilon, min_samples=nmin).fit(data_filtered[['longitude', 'latitude']]).labels_
-            labels=['Campagne' if ( dbscan_label == -1) else 'Ville' for dbscan_label in dbscan_labels]
-            labelsToColors={'Campagne':'green', 'Ville':'blue'}
+            labels = pd.Series(['Campagne' if label == -1 else 'Ville' for label in dbscan_labels], index=data_filtered.index)
+            labelsToColors = {'Campagne': 'green', 'Ville': 'blue'}
         case "Opérateurs":
             labels = data_filtered['nom_op']
             labelsToColors={'Orange':'#fc5603','SFR':'#169e26','Bouygues Telecom':'#035afc', 'Free Mobile':'#dbd640'}
@@ -53,7 +53,7 @@ def getPointsInfos(data_filtered, option, epsilon, nmin, selected_tech):
 
             # Remplir labels avec les noms des technologies les plus élevées
             labels = highest_tech
-            print(labels)
+            
             labelsToColors={"2g":' #4285F4',"3g":'#34A853',"4g":'#FBBC05', "5g":' #EA4335'}
     return (labels,labelsToColors)
 
