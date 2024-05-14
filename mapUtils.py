@@ -5,10 +5,6 @@ from sklearn.cluster import DBSCAN
 from scipy.spatial import Voronoi, Delaunay
 import numpy as np
 
-# Default map location
-location = [45.5, 4.5]
-zoom_start = 5
-tiles = "Cartodb Positron"
 
 def getPopUp(lat, lon, num, op, s2g, s3g, s4g, s5g):
     return f"Station de base : \n{num}\nOperateur :\n{op}\ntechnos : {technosToTxt(s2g, s3g, s4g, s5g)}"
@@ -27,6 +23,7 @@ def addLegend(map, labelsToColors):
         legend_html += f"\n&nbsp; <span style='color:{labelsToColors.get(label)}'>&#9632;</span> {label} <br>\n"
     legend_html += '</div>'
     map.get_root().html.add_child(folium.Element(legend_html))
+
 
 # Fonction pour trouver la colonne la plus à droite où la valeur est 1 (True) pour chaque ligne
 def find_rightmost_true(row):
@@ -49,18 +46,18 @@ def getPointsInfos(data_filtered, option, epsilon, nmin, selected_tech):
 
             # Trouver la technologie la plus élevée pour chaque ligne
             # Appliquer la fonction à chaque ligne du DataFrame
-            highest_tech = tech_df.apply(find_rightmost_true, axis=1).apply(lambda x: x.split('_')[1])
+            highest_tech = tech_df.apply(find_rightmost_true, axis=1).apply(lambda x: x.split('_')[1].upper())
 
             # Remplir labels avec les noms des technologies les plus élevées
             labels = highest_tech
             
-            labelsToColors={"2g":' #4285F4',"3g":'#34A853',"4g":'#FBBC05', "5g":' #EA4335'}
+            labelsToColors={"2G":' #4285F4',"3G":'#34A853',"4G":'#FBBC05', "5G":' #EA4335'}
     return (labels,labelsToColors)
 
             
 
 
-def getMap(data, selected_providers, selected_regions, selected_technologies, option, epsilon, nmin):
+def getMap(data, selected_providers, selected_regions, selected_technologies, option, epsilon=0, nmin=0, location = [45.5, 4.5], zoom_start = 5, tiles = "Cartodb Positron"):
     map = folium.Map(location=location, zoom_start=zoom_start, tiles=tiles)
     data_filtered = data[data['nom_reg'].isin(selected_regions)]      
     data_filtered = data_filtered[data_filtered['nom_op'].isin(selected_providers)]
