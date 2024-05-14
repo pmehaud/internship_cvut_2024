@@ -28,6 +28,10 @@ def addLegend(map, labelsToColors):
     legend_html += '</div>'
     map.get_root().html.add_child(folium.Element(legend_html))
 
+# Fonction pour trouver la colonne la plus à droite où la valeur est 1 (True) pour chaque ligne
+def find_rightmost_true(row):
+    return row[::-1].idxmax()
+
 def getPointsInfos(data_filtered, option, epsilon, nmin, selected_tech):
     labels = pd.DataFrame(index=data_filtered.index)
     labelsToColors=dict()
@@ -44,12 +48,13 @@ def getPointsInfos(data_filtered, option, epsilon, nmin, selected_tech):
             tech_df = data_filtered[selected_tech]
 
             # Trouver la technologie la plus élevée pour chaque ligne
-            highest_tech = tech_df.idxmax(axis=1).apply(lambda x: x.split('_')[1].upper())
+            # Appliquer la fonction à chaque ligne du DataFrame
+            highest_tech = tech_df.apply(find_rightmost_true, axis=1).apply(lambda x: x.split('_')[1])
 
             # Remplir labels avec les noms des technologies les plus élevées
             labels = highest_tech
-
-            labelsToColors={"2G":'lime',"3G":'yellow',"4G":'orange', "5G":'red'}
+            print(labels)
+            labelsToColors={"2g":' #4285F4',"3g":'#34A853',"4g":'#FBBC05', "5g":' #EA4335'}
     return (labels,labelsToColors)
 
             
