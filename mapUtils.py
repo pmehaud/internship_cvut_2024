@@ -39,7 +39,7 @@ def getPointsInfos(data_filtered, option, epsilon, nmin, selected_tech):
             labelsToColors = {'Campagne': 'green', 'Ville': 'blue'}
         case "Opérateurs":
             labels = data_filtered['nom_op']
-            labelsToColors={'Orange':'#fc5603','SFR':'#169e26','Bouygues Telecom':'#035afc', 'Free Mobile':'#dbd640'}
+            labelsToColors={'Bouygues Telecom':'#035afc','SFR':'#169e26', 'Free Mobile':'#dbd640', 'Orange':'#fc5603'}
         case "Technologies":
             # Créer un DataFrame avec les technologies sélectionnées
             tech_df = data_filtered[selected_tech]
@@ -52,6 +52,7 @@ def getPointsInfos(data_filtered, option, epsilon, nmin, selected_tech):
             labels = highest_tech
             
             labelsToColors={"2G":' #4285F4',"3G":'#34A853',"4G":'#FBBC05', "5G":' #EA4335'}
+    
     return (labels,labelsToColors)
 
             
@@ -63,6 +64,7 @@ def getMap(data, selected_providers, selected_regions, selected_technologies, op
     data_filtered = data_filtered[data_filtered['nom_op'].isin(selected_providers)]
     data_filtered = data_filtered[data_filtered[selected_technologies].any(axis=1)]
     # Obtenez les labels et les couleurs correspondantes
+    
     labels, labelsToColors = getPointsInfos(data_filtered, option, epsilon, nmin, selected_technologies)
     
     if(option=="Delaunay" or option == "Voronoi"):
