@@ -39,7 +39,7 @@ def getPointsInfos(data_filtered, option, epsilon, nmin, selected_tech):
             labelsToColors = {'Campagne': 'green', 'Ville': 'blue'}
         case "Opérateurs":
             labels = data_filtered['nom_op']
-            labelsToColors={'Bouygues Telecom':'#035afc','SFR':'#169e26', 'Free Mobile':'#dbd640', 'Orange':'#fc5603'}
+            labelsToColors={'Bouygues Telecom':'#035afc', 'Orange':'#fc5603', 'SFR':'#169e26', 'Free Mobile':'#dbd640'}
         case "Technologies":
             # Créer un DataFrame avec les technologies sélectionnées
             tech_df = data_filtered[selected_tech]
