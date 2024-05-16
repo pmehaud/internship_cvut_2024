@@ -1,6 +1,38 @@
 # Analyse des données
 ## Description des champs :
  cf. https://data.arcep.fr/mobile/sites/
+## A quoi ressemble la base ?
+|   code_op | nom_op   | num_site   |   id_site_partage |   id_station_anfr |      x |       y | latitude   | longitude   | nom_reg            |
+|----------:|:---------|:-----------|------------------:|------------------:|-------:|--------:|:-----------|:------------|:-------------------|
+|     20801 | Orange   | 00000001A1 |               nan |        0802290015 | 687035 | 6985761 | 49,97028   | 2,81944     | Hauts-de-France    |
+|     20801 | Orange   | 00000001B1 |               nan |        0642290151 | 422853 | 6249263 | 43,28861   | -0,41389    | Nouvelle-Aquitaine |
+|     20801 | Orange   | 00000001B2 |               nan |        0332290026 | 416932 | 6422196 | 44,84112   | -0,58333    | Nouvelle-Aquitaine |
+|     20801 | Orange   | 00000001B3 |               nan |        0472290005 | 511106 | 6349234 | 44,21666   | 0,63556     | Nouvelle-Aquitaine |
+|     20801 | Orange   | 00000001C1 |               nan |        0512290147 | 836824 | 6889450 | 49,09028   | 4,87333     | Grand Est          |
+
+| nom_dep              |   insee_dep | nom_com          |   insee_com |   site_2g |   site_3g |   site_4g |   site_5g |   mes_4g_trim |   site_ZB |
+|:---------------------|------------:|:-----------------|------------:|----------:|----------:|----------:|----------:|--------------:|----------:|
+| Somme                |          80 | Curlu            |       80231 |         1 |         1 |         1 |         0 |             0 |         0 |
+| Pyrénées-Atlantiques |          64 | Jurançon         |       64284 |         1 |         1 |         1 |         1 |             0 |         0 |
+| Gironde              |          33 | Bordeaux         |       33063 |         1 |         1 |         1 |         1 |             0 |         0 |
+| Lot-et-Garonne       |          47 | Agen             |       47001 |         1 |         1 |         1 |         0 |             0 |         0 |
+| Marne                |          51 | Sainte-Menehould |       51507 |         1 |         1 |         1 |         0 |             0 |         0 |
+
+|   site_DCC |   site_strategique |   site_capa_240mbps | date_ouverturecommerciale_5g   |   site_5g_700_m_hz |   site_5g_800_m_hz |
+|-----------:|-------------------:|--------------------:|:-------------------------------|-------------------:|-------------------:|
+|          0 |                  0 |                   0 | nan                            |                  0 |                  0 |
+|          0 |                  0 |                   1 | 2020-12-14                     |                  0 |                  0 |
+|          0 |                  0 |                   1 | 2021-02-22                     |                  0 |                  0 |
+|          0 |                  0 |                   1 | nan                            |                  0 |                  0 |
+|          0 |                  0 |                   1 | nan                            |                  0 |                  0 |
+
+|   site_5g_1800_m_hz |   site_5g_2100_m_hz |   site_5g_3500_m_hz |
+|--------------------:|--------------------:|--------------------:|
+|                   0 |                   0 |                   0 |
+|                   0 |                   1 |                   0 |
+|                   0 |                   0 |                   1 |
+|                   0 |                   0 |                   0 |
+|                   0 |                   0 |                   0 |
 ## Chiffres sur les stations de base :
 ### Chiffres généraux :
 |||
