@@ -13,7 +13,7 @@ import copy
 
 ctk.set_default_color_theme("dark-blue")
 
-df = pd.read_csv("database/data.csv", sep=";", decimal=',')
+df = pd.read_csv("../../database/data.csv", sep=";", decimal=',')
 df = df.sample(frac=1).reset_index(drop=True)
 
 # Sample data for regions and providers
@@ -34,8 +34,8 @@ def plotMap():
 
         map = mu.getMap(data = copy.deepcopy(df), selected_providers = selected_providers, selected_regions = selected_regions, selected_technologies = selected_technologies, option = action_var.get(), epsilon=float(epsilon_entry.get()), nmin=int(n_min_entry.get()))
         # Save map to HTML file
-        map_file = "temp_map.html"
-        map.save(map_file)
+        map_file = "temp_map"
+        map.save(f"../../out/maps/{map_file}.html")
 
         # Open the map file in a web browser
         webbrowser.open(map_file)

@@ -3,3 +3,4 @@ local
 *checkpoints
 *.html
 *.pyc
+out/*
