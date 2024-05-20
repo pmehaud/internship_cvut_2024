@@ -1,0 +1,144 @@
+\documentclass[french, 9pt,xcolor={table,dvipsnames},t,aspectratio=169,onlytextwidth,mathserif]{beamer}
+
+\usetheme{PSU}
+
+\input{preambule}
+
+% Contenu de la page de garde
+\title[Stage ČVUT]{Étude théorique : stations de base du réseau téléphonique français}
+\subtitle{Progression du stage}
+\author{Paul MÉHAUD, Brendan SÉVELLEC}
+\institute{České Vysoké Učení Technické v Praze}
+\date{mai - août 2024}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+
+\begin{frame}{Déroulé de la présentation}
+    \tableofcontents
+\end{frame}
+\addtocontents{toc}{\protect\setcounter{tocdepth}{1}}
+
+
+\section{Introduction}
+\insertsectionframe
+
+
+\begin{frame}{Contexte général}
+
+    \begin{alertblock}{Objectifs}
+        \begin{itemize}
+            \item Déterminer si les stations de base sont en zone urbaine ou rurale;
+            \item Chercher les stations de bases voisines les unes des autres pour aider à déterminer si les utilisateurs sont en mouvement.
+        \end{itemize}
+    \end{alertblock}
+
+    \begin{block}{Méthodes}
+        \begin{itemize}
+            \item Approche par la théorie des graphes ;
+            \item Approche par le machine learning.
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+
+\section{Données}
+\insertsectionframe
+
+\begin{frame}{Données}
+    \begin{block}{Arcep}
+        Autorité de régulation des communications électroniques, des postes et de la distribution de la presse.
+    \end{block}
+
+    \begin{block}{Jeu de données}
+        Le jeu de données \texttt{2023\_T4\_sites\_Metropole.csv} \footnote{\url{https://data.arcep.fr/mobile/sites/}} représente les stations de bases au trimestre 4 de 2023 avec leur position géographique (taille : $\unit[16,7]{Mo}$).
+    \end{block}
+
+    A retenir :
+    \begin{itemize}
+        \item $108\,838$ sites;
+        \item $29$ attributs.
+    \end{itemize}
+\end{frame}
+
+{
+\smallframetitle
+\begin{frame}{A quoi ressemble notre base ?}
+    \begin{table}[H]
+        \centering
+        \tiny
+        \begin{tabular}{cccccccccc}
+        \hline
+            \textbf{code\_op} & \textbf{nom\_op} & \textbf{num\_site} & \textbf{id\_site\_partage} & \textbf{id\_station\_anfr} & \textbf{x} & \textbf{y} & \textbf{latitude} & \textbf{longitude} & \textbf{nom\_reg} \\ \hline
+            20801 & Orange & 00000001A1 & nan & 0802290015 & 687035 & 6985761 & 49,97028 & 2,81944 & Hauts-de-France \\ 
+            20801 & Orange & 00000001B1 & nan & 0642290151 & 422853 & 6249263 & 43,28861 & -0,41389 & Nouvelle-Aquitaine \\ 
+            20801 & Orange & 00000001B2 & nan & 0332290026 & 416932 & 6422196 & 44,84112 & -0,58333 & Nouvelle-Aquitaine \\ 
+            20801 & Orange & 00000001B3 & nan & 0472290005 & 511106 & 6349234 & 44,21666 & 0,63556 & Nouvelle-Aquitaine \\ 
+            20801 & Orange & 00000001C1 & nan & 0512290147 & 836824 & 6889450 & 49,09028 & 4,87333 & Grand Est \\ \hline
+        \end{tabular}
+        \begin{tabular}{cccccccccc}
+        \hline
+            \textbf{nom\_dep} & \textbf{insee\_dep} & \textbf{nom\_com} & \textbf{insee\_com} & \textbf{site\_2g} & \textbf{site\_3g} & \textbf{site\_4g} & \textbf{site\_5g} & \textbf{mes\_4g\_trim} & \textbf{site\_ZB} \\ \hline
+            Somme & 80 & Curlu & 80231 & 1 & 1 & 1 & 0 & 0 & 0 \\ 
+            Pyrénées-Atlantiques & 64 & Jurançon & 64284 & 1 & 1 & 1 & 1 & 0 & 0 \\ 
+            Gironde & 33 & Bordeaux & 33063 & 1 & 1 & 1 & 1 & 0 & 0 \\ 
+            Lot-et-Garonne & 47 & Agen & 47001 & 1 & 1 & 1 & 0 & 0 & 0 \\ 
+            Marne & 51 & Sainte-Menehould & 51507 & 1 & 1 & 1 & 0 & 0 & 0 \\ \hline
+        \end{tabular}
+        \begin{tabular}{cccccc}
+        \hline
+            \textbf{site\_DCC} & \textbf{site\_strategique} & \textbf{site\_capa\_240mbps} & \textbf{date\_ouverturecommerciale\_5g} & \textbf{site\_5g\_700\_m\_hz} & \textbf{site\_5g\_800\_m\_hz} \\ \hline
+            0 & 0 & 0 & nan & 0 & 0 \\ 
+            0 & 0 & 1 & 2020-12-14 & 0 & 0 \\ 
+            0 & 0 & 1 & 2021-02-22 & 0 & 0 \\ 
+            0 & 0 & 1 & nan & 0 & 0 \\ 
+            0 & 0 & 1 & nan & 0 & 0 \\ \hline
+        \end{tabular}
+        \begin{tabular}{ccc}
+        \hline
+            \textbf{site\_5g\_1800\_m\_hz} & \textbf{site\_5g\_2100\_m\_hz} & \textbf{site\_5g\_3500\_m\_hz} \\ \hline
+            0 & 0 & 0 \\ 
+            0 & 1 & 0 \\ 
+            0 & 0 & 1 \\ 
+            0 & 0 & 0 \\ 
+            0 & 0 & 0 \\ \hline
+        \end{tabular}
+        \caption{Premières valeurs de la base}
+    \end{table}
+\end{frame}
+
+\begin{frame}{Description (1/2)}
+    \begin{block}{Ce qui nous intéresse}
+        \begin{enumerate}
+            \item \textsl{longitude}, \textsl{latitude} : coordonnées de chaque site;
+            \item \textsl{nom\_op} : nom commercial de l'opérateur;
+            \item \textsl{nom\_reg}, \textsl{nom\_dep} et \textsl{nom\_com} : nom de la région, du département et de la commune d'implantation du site;
+            \item \textsl{site\_$x$g} : équipement du site en technologie $x$G ($x\in\{ 2,\dots,5\}$);
+            \item \textsl{num\_site} : identifiant du site issu du SI de l'opérateur. 
+        \end{enumerate}
+    \end{block}
+\end{frame}
+
+\begin{frame}{Description (2/2)}
+    \begin{block}{Ce qu'il faut retenir}
+        \begin{enumerate}
+            \item  Répartition équitable du nombre de sites en fonction de l'opérateur ($\simeq 27\,000$) ;
+            \item $99,6\%$ des sites équipés en 4G;
+            \item $6$ stations en moyenne par commune.
+        \end{enumerate}
+    \end{block}
+
+    La construction de cette base ne nous permet pas de faire de statistiques descriptives intéressantes.
+\end{frame}
+}
+
+
+\input{weeks/7-05_14-05}
+
+\input{weeks/14-05_21-05}
+
+\end{document}

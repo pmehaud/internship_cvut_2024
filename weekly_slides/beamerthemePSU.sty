@@ -1,0 +1,190 @@
+% beamerthemeUCBerkeley.sty v1.2 (January 5, 2021)
+% by Overleaf (LianTze Lim, Ryan Looney)
+
+%Penn adaptation by Andrea Ceolin (March 16, 2021)
+%PSU IST adaptation by Taha Eghtesad (March 6, 2024)
+\ProvidesPackage{beamerthemePSU}
+
+\usepackage{silence}
+% \WarningsOff[mathdesign/mdbch]
+
+\usepackage{etoolbox}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{caption}[numbered]
+
+% \usepackage{fontspec}
+% \setsansfont{Verdana}
+
+% \setmathrm{Latin Modern Math}[]
+% \setmathsf{Latin Modern Math}[]
+% \setmathtt{Latin Modern Math}[]
+% \setboldmathrm{Latin Modern Math}[]
+
+
+\usepackage{tikz}
+
+%These are the official Penn colors
+\definecolor{PennRed}{RGB}{153,0,0}
+\definecolor{PennBlue}{RGB}{1,31,91}
+
+%These Gold and Green would match well with the official Penn colors (courtesy of Jordan Kodner)
+\definecolor{PennGold}{RGB}{179,141,25}
+\definecolor{PennGreen}{RGB}{51,111,0}
+
+%These are the colors developed for the Berkeley template
+\definecolor{BerkeleyGold}{RGB}{193,129,45}
+\definecolor{Medalist}{HTML}{C4820E}
+\definecolor{BerkeleyBlueText}{RGB}{48,99,126}
+\definecolor{FoundersRock}{HTML}{3B7EA1}
+\definecolor{BerkeleyTableGold}{RGB}{222,157,46}
+\definecolor{CaliforniaGold}{HTML}{FDB515}
+\definecolor{BerkeleyTableBlue1}{RGB}{207,226,234}
+\definecolor{BerkeleyTableBlue2}{RGB}{232,241,245}
+\definecolor{BerkeleyBlue}{HTML}{003262}
+
+%These colors are extracted for PSU Template from PSU Brand Book: https://pennstateoffice365.sharepoint.com/:f:/s/BrandBookWebsite/EuiPObmkIK9Ovx8gR7LiI1wBcpb6VR8ZnreaJzoa-7yYTA
+\definecolor{NittanyNavy}{HTML}{001E44}
+\definecolor{BeaverBlue}{HTML}{1E407C}
+\definecolor{WhiteOut}{HTML}{FFFFFF}
+\definecolor{PughBlue}{HTML}{96BEE6}
+\definecolor{OldCoaly}{HTML}{262626}
+\definecolor{LandGrant}{HTML}{6A3028}
+\definecolor{PennsForest}{HTML}{4A7729}
+\definecolor{DawnOfDiscovery}{HTML}{F2665E}
+\definecolor{PACreek}{HTML}{3EA39E}
+\definecolor{PACreekMaxLight}{HTML}{EDF8F7}
+\definecolor{PASky}{HTML}{CCF0FF}
+\definecolor{PASkyLight}{HTML}{CCF0FF}
+\definecolor{PASkyMaxLight}{HTML}{eaf3f7}
+\definecolor{PASlate}{HTML}{314D64}
+\definecolor{PASlateMaxLight}{HTML}{EEF3F7}
+\definecolor{LionsRoar}{HTML}{BF8226}
+\definecolor{LionShrine}{HTML}{B88965}
+\definecolor{Original87}{HTML}{BC204B}
+\definecolor{InventOrange}{HTML}{E98300}
+\definecolor{BrightKeystone}{HTML}{f7db5e}
+
+\setbeamertemplate{title page}[default][left]
+\setbeamerfont{title}{family=\sffamily,size=\Huge}
+\setbeamerfont{author}{size=\Huge}
+\setbeamerfont{institute}{size=\large}
+\setbeamercolor{author}{fg=LandGrant}
+\setbeamerfont{caption}{size=\scriptsize}
+
+\setbeamersize{text margin left=2em, text margin right=2em}
+
+\setbeamertemplate{frametitle}{\vskip0.05\paperheight\insertframetitle\vskip0.02\paperheight\usebeamerfont{framesubtitle}\hskip0.02\paperwidth\color{LandGrant}\insertframesubtitle} 
+\setbeamerfont{frametitle}{family=\sffamily,series=\mdseries,size=\LARGE}
+\setbeamerfont{framesubtitle}{family=\sffamily,series=\mdseries,size=\large}
+
+\setbeamertemplate{blocks}[rounded]%[shadow=true]
+\setbeamercolor{block title}{fg=WhiteOut, bg=BeaverBlue}
+\setbeamercolor{block body}{fg=BeaverBlue, bg=PASkyMaxLight}
+\setbeamerfont{block title}{family=\sffamily,size=\normalsize}
+\setbeamerfont{block body}{family=\sffamily,size=\small}
+
+\setbeamercolor{block title example}{fg=WhiteOut, bg=PASlate}
+\setbeamercolor{block body example}{fg=NittanyNavy, bg=PASlateMaxLight}
+\setbeamerfont{block title example}{family=\sffamily,series=\mdseries,size=\footnotesize}
+\setbeamerfont{block body example}{family=\rmfamily,series=\slshape,size=\small}
+
+\setbeamercolor{block title alerted}{fg=WhiteOut, bg=BeaverBlue}
+\setbeamercolor{block body alerted}{fg=NittanyNavy, bg=BrightKeystone}
+\setbeamerfont{block body alerted}{family=\sffamily,size=\small}
+
+\setbeamercolor{titlelike}{fg=BeaverBlue}
+\setbeamercolor{normal text}{fg=NittanyNavy}
+\setbeamercolor{structure}{fg=NittanyNavy}
+
+\setbeamertemplate{itemize item}{\textbullet}
+\setbeamertemplate{itemize subitem}{--}
+\setbeamertemplate{itemize subsubitem}{\textbullet}
+\setlength{\leftmargini}{1.25em}
+\setlength{\leftmarginii}{1em}
+\setlength{\leftmarginiii}{1em}
+
+\setbeamertemplate{bibliography item}{\insertbiblabel}
+
+\pgfdeclareimage[height=0.09\paperheight]{logo}{images/logos/CVUT_logo.jpg}
+
+\setbeamertemplate{background}{%
+\begin{tikzpicture}[overlay,remember picture]
+  \fill[BeaverBlue] (current page.south west) -- +(0, 0.18\paperheight) -- +(\paperwidth, 0.08\paperheight) -- (current page.south east) -- cycle;  
+\node[anchor=south west,inner sep=0pt,draw=none,xshift=0.055\paperheight,yshift=0.04\paperheight] at (current page.south west) {\pgfuseimage{logo}};%
+
+\node [anchor=east, xshift=-.01\paperheight, yshift=0.045\paperheight, text=WhiteOut] at (current page.south east) {\footnotesize\insertsectionhead $\mid$ \scriptsize\insertsubsectionhead $\mid$ \tiny\insertframenumber/\inserttotalframenumber};
+
+\end{tikzpicture}%
+}
+
+\setbeamertemplate{footline}{%
+\vskip0.15\paperheight
+}
+
+\setbeamercolor{headline}{bg=BeaverBlue}
+\setbeamercolor{section in head/foot}{fg=WhiteOut}
+\setbeamertemplate{headline}{%
+\leavevmode%
+  \hbox{%
+    \begin{beamercolorbox}[wd=\paperwidth,ht=2.5ex,dp=1.125ex]{headline}%
+    \insertsectionnavigationhorizontal{0.98\paperwidth}{}
+    {\hskip0pt plus1filll}
+    \end{beamercolorbox}%
+  }
+  \vspace{-1.5em}
+}
+
+\newcommand{\smallframetitle}{%
+  \setbeamertemplate{frametitle}{\vskip0.07\paperheight\insertframetitle}
+  \setbeamerfont{frametitle}{size=\large,series=\bfseries}
+}
+\newcommand{\normalframetitle}{%
+  \setbeamertemplate{frametitle}{\vskip0.2\paperheight\insertframetitle} 
+  \setbeamerfont{frametitle}{size=\LARGE,series=\mdseries}
+}
+
+\newcommand{\tableheadrow}{\rowcolor{BeaverBlue}}
+\newcommand{\tableheadcol}[1]{{\bfseries\color{WhiteOut}#1}}
+% \rowcolors{2}{WhiteOut}{PACreekMaxLight}
+\AtBeginEnvironment{tabular}{\color{NittanyNavy}}
+
+\setbeamerfont{sectiontitle}{size=\Large,series=\bfseries}
+\setbeamerfont{subsectiontitle}{size=\small,series=\bfseries}
+\setbeamerfont{subsubsectiontitle}{size=\scriptsize,series=\bfseries}
+
+
+\newcommand{\insertsectionframe}{
+{
+\setbeamercolor{background canvas}{bg=BeaverBlue}
+  \begin{frame}
+  \vspace{0.35\paperheight}
+  \centering
+  \color{WhiteOut}\usebeamerfont{sectiontitle}\insertsection
+  \vfill
+  \end{frame}
+}
+}
+
+\newcommand{\insertsubsectionframe}{
+{
+\setbeamercolor{background canvas}{bg=BeaverBlue}
+  \begin{frame}
+  \vspace{0.35\paperheight}
+  \centering\color{WhiteOut}\usebeamerfont{sectiontitle}\insertsection \\ 
+  \vspace{0.5em}\usebeamerfont{subsectiontitle}\insertsubsection
+  \vfill
+  \end{frame}
+}
+}
+
+\newcommand{\insertsubsubsectionframe}
+{
+\setbeamercolor{background canvas}{bg=BeaverBlue}
+  \begin{frame}
+  \vspace{0.35\paperheight}
+  \centering\color{WhiteOut}\usebeamerfont{sectiontitle}\insertsection \\
+  \vspace{0.5em}\usebeamerfont{subsectiontitle}\insertsubsection \\
+  \vspace{0.5em}\usebeamerfont{subsubsectiontitle}\insertsubsubsection
+  \vfill
+  \end{frame}
+}
