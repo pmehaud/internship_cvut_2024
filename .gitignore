@@ -3,7 +3,6 @@ local
 *checkpoints
 *.html
 *.pyc
-plot_saving
 *.ps
 *.dvi
 *.aux
@@ -19,4 +18,5 @@ plot_saving
 main.pdf
 *.snm
 *.nav
-weekly_slides/images
+*.png
+*.jpg
