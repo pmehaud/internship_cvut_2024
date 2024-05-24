@@ -36,15 +36,7 @@ def km_distance(pt1, pt2):
     return distance
 
 # for both quadrant and angle criterias
-def compute_angles(ref_point, pos):
-    angles = pd.Series()
-    for k in pos:
-        angles[k] = np.degrees(np.arctan2(pos[k][1] - pos[ref_point][1], pos[k][0] - pos[ref_point][0]))
-    angles = (angles + 360) % 360
-
-    return angles
-
-def compute_angles_v2(ref_point, adj, pos): #ref_point: name of the central point / adj: name of the adjacent nodes
+def compute_angles(ref_point, adj, pos): #ref_point: name of the central point / adj: name of the adjacent nodes
     angles = []
     for neighbour in adj:
         x_neighbour = pos[neighbour][0]
@@ -53,15 +45,15 @@ def compute_angles_v2(ref_point, adj, pos): #ref_point: name of the central poin
         angles.append(np.degrees(np.arctan2(y_neighbour - pos[ref_point][1], x_neighbour - pos[ref_point][0])))
     angles = [(k + 360) % 360 for k in angles]
 
-    return angles
+    return np.array(angles)
 
 # for the quadrant criteria
-def create_6_quadrants(ref_point, pos):
-    angles = compute_angles(ref_point,pos)
+def create_6_quadrants(ref_point, adj, pos):
+    angles = compute_angles(ref_point, adj, pos)
 
     quadrants = dict()
     for ind in range(0, 301, 60):
-        quadrants[f"{ind}_{ind+60}"] = np.where((angles >= ind) & (angles < ind + 60))[0]
+        quadrants[f"{ind}_{ind+60}"] = [adj[k] for k in np.where((angles >= ind) & (angles < ind + 60))[0]] # to have the real name of the node
 
     return quadrants
 
@@ -152,19 +144,20 @@ def quadrant_criteria_v2(G, pos):
     """
     modif_G = copy.deepcopy(G)
     for node in tqdm(pos.keys(), desc="nodes"):
-        quadrants = create_6_quadrants(node, pos)
-        NN = set()
+        neighbours = [edge[1] for edge in modif_G.edges(node)]
+        edges_to_remove = list(modif_G.edges(node))
+        quadrants = create_6_quadrants(node, neighbours, pos)
+
         for quad in quadrants.values():
-            NN.add(nearestNeighbour(node, quad, pos)) # finding the nearest neighbour in the quadrant centered on node
-        edges_to_remove = []
-        for edge in modif_G.edges(node):
-            if(edge[1] not in NN):
-                edges_to_remove.append(edge)
+            Near = nearestNeighbour(node, quad, pos)
+            if(Near!=node):
+                edges_to_remove.remove((node, Near)) # removing the nearest neighbour in the quadrant centered on node from the edges to remove
+        
         modif_G.remove_edges_from(edges_to_remove)
 
     return modif_G
 
-def angle_criteria(G, pos, min_angle = 20):
+def angle_criteria(G, pos, min_angle = 30):
     """ Removes all the edges of G wich doesn't respect the angle criteria.
         
         Parameters
@@ -173,7 +166,7 @@ def angle_criteria(G, pos, min_angle = 20):
             A Networkx Graph graph.
         pos : dict
             The position of G's nodes.
-        min_angle : int (default=20)
+        min_angle : int (default=30)
             The minimum accepted angle between two neighbours.
 
         Returns
@@ -185,7 +178,7 @@ def angle_criteria(G, pos, min_angle = 20):
 
     for node in tqdm(pos.keys(), desc="nodes"):
         neighbours = [edge[1] for edge in G.edges(node)]
-        angles = compute_angles_v2(node, neighbours, pos)
+        angles = compute_angles(node, neighbours, pos)
         idx_angles = np.argsort(angles) # angle des voisins de node
 
         for i, id in enumerate(idx_angles):
