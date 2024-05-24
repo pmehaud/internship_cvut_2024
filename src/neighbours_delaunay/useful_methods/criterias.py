@@ -44,6 +44,17 @@ def compute_angles(ref_point, pos):
 
     return angles
 
+def compute_angles_v2(ref_point, adj, pos): #ref_point: name of the central point / adj: name of the adjacent nodes
+    angles = []
+    for neighbour in adj:
+        x_neighbour = pos[neighbour][0]
+        y_neighbour = pos[neighbour][1]
+
+        angles.append(np.degrees(np.arctan2(y_neighbour - pos[ref_point][1], x_neighbour - pos[ref_point][0])))
+    angles = [(k + 360) % 360 for k in angles]
+
+    return angles
+
 # for the quadrant criteria
 def create_6_quadrants(ref_point, pos):
     angles = compute_angles(ref_point,pos)
@@ -153,7 +164,7 @@ def quadrant_criteria_v2(G, pos):
 
     return modif_G
 
-def angle_criteria(G, pos):
+def angle_criteria(G, pos, min_angle = 20):
     """ Removes all the edges of G wich doesn't respect the angle criteria.
         
         Parameters
@@ -162,6 +173,8 @@ def angle_criteria(G, pos):
             A Networkx Graph graph.
         pos : dict
             The position of G's nodes.
+        min_angle : int (default=20)
+            The minimum accepted angle between two neighbours.
 
         Returns
         -------
@@ -169,15 +182,19 @@ def angle_criteria(G, pos):
             The modified graph.
     """
     modif_G = copy.deepcopy(G)
-    min_angle = 20 # minimum angle between two neighbours
+
     for node in tqdm(pos.keys(), desc="nodes"):
-        angles = compute_angles(node,pos).sort_values()[1:]
-        for edge in modif_G.edges:
-            prev_iter = angles.index[0]
-            for iter in angles.index[1:]:
-                if((node in edge) and (iter in edge)):
-                    prev_iter = iter
-                    if(angles[iter] - angles[prev_iter] <= min_angle):
-                        modif_G.remove_edges_from([edge])
+        neighbours = [edge[1] for edge in G.edges(node)]
+        angles = compute_angles_v2(node, neighbours, pos)
+        idx_angles = np.argsort(angles) # angle des voisins de node
+
+        for i, id in enumerate(idx_angles):
+            if(i < len(idx_angles) - 1):
+                next_id = idx_angles[i + 1]
+                if((angles[next_id] - angles[id]) <= min_angle):
+                    if(km_distance(pos[node], pos[neighbours[id]]) > km_distance(pos[node], pos[neighbours[next_id]])):
+                        modif_G.remove_edges_from([(node, neighbours[id])])
+                    else:
+                        modif_G.remove_edges_from([(node, neighbours[next_id])])
         
     return modif_G
