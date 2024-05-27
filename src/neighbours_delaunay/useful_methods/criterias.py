@@ -43,7 +43,7 @@ def compute_angles(ref_point, adj, pos): #ref_point: name of the central point /
         y_neighbour = pos[neighbour][1]
 
         angles.append(np.degrees(np.arctan2(y_neighbour - pos[ref_point][1], x_neighbour - pos[ref_point][0])))
-    angles = [(k + 360) % 360 for k in angles]
+    angles = [round((k + 360) % 360) for k in angles]
 
     return np.array(angles)
 
@@ -70,6 +70,12 @@ def nearestNeighbour(ref_point, neighbours, pos):
             nearestNeighbour = pt2
 
     return nearestNeighbour
+
+def angle_elim(G, pos, node, neighbours, id, next_id):
+    if(km_distance(pos[node], pos[neighbours[id]]) > km_distance(pos[node], pos[neighbours[next_id]])):
+        G.remove_edges_from([(node, neighbours[id])])
+    else:
+        G.remove_edges_from([(node, neighbours[next_id])])
 
 
 #===========#
@@ -177,7 +183,7 @@ def angle_criteria(G, pos, min_angle = 30):
     modif_G = copy.deepcopy(G)
 
     for node in tqdm(pos.keys(), desc="nodes"):
-        neighbours = [edge[1] for edge in G.edges(node)]
+        neighbours = [edge[1] for edge in modif_G.edges(node)]
         angles = compute_angles(node, neighbours, pos)
         idx_angles = np.argsort(angles) # angle des voisins de node
 
@@ -185,9 +191,11 @@ def angle_criteria(G, pos, min_angle = 30):
             if(i < len(idx_angles) - 1):
                 next_id = idx_angles[i + 1]
                 if((angles[next_id] - angles[id]) <= min_angle):
-                    if(km_distance(pos[node], pos[neighbours[id]]) > km_distance(pos[node], pos[neighbours[next_id]])):
-                        modif_G.remove_edges_from([(node, neighbours[id])])
-                    else:
-                        modif_G.remove_edges_from([(node, neighbours[next_id])])
+                    angle_elim(modif_G, pos, node, neighbours, id, next_id)
+                
+        next_id = idx_angles[-1]
+        id = idx_angles[0]
+        if((360 - angles[next_id] + angles[id]) <= min_angle):
+            angle_elim(modif_G, pos, node, neighbours, id, next_id)
         
     return modif_G
