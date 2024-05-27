@@ -4,6 +4,8 @@
 
 import matplotlib.pyplot as plt # type: ignore
 import networkx as nx # type: ignore
+import pandas as pd # type: ignore
+import geopandas as gpd # type: ignore
 
 #==================#
 # Global variables #
@@ -41,8 +43,61 @@ def plot_params(title, ax, long_points, lat_points):
         right=False
     )
     
-    ax.set_xlim(min(long_points)-0.05, max(long_points)+0.05)
-    ax.set_ylim(min(lat_points)-0.05, max(lat_points)+0.05)
+    # ax.set_xlim(min(long_points)-0.05, max(long_points)+0.05)
+    # ax.set_ylim(min(lat_points)-0.05, max(lat_points)+0.05)
+
+#====================#
+# Department borders #
+#====================#
+
+# Importing database
+df = pd.read_csv("../../database/data.csv", sep=";", decimal=",")
+df.head()
+
+# Importing the borders database
+chemin = '../../local/travail_anneePrec/departements-20180101.shx'
+geo_df_shx = gpd.read_file(chemin)
+
+# Removing useless columns and renaming
+geo_df = geo_df_shx.drop([ 'wikipedia', 'nuts3', 'surf_km2'], axis = 1)
+geo_df = geo_df.rename(columns={'code_insee': 'insee_dep', 'nom': 'nom_dep'})
+geo_df = geo_df.drop(geo_df[(geo_df['insee_dep'] == '973') | (geo_df['insee_dep'] == '972') | (geo_df['insee_dep'] == '974') | (geo_df['insee_dep'] == '976') | (geo_df['insee_dep'] == '971')].index)
+geo_df.index = geo_df.index.astype(str)
+
+# On joint la Métropole de Lyon et le Rhône
+polygone_rhone = geo_df[geo_df['insee_dep'] == "69D"]['geometry'].values[0]
+polygone_lyon = geo_df[geo_df['insee_dep'] == "69M"]['geometry'].values[0]
+
+
+# Créer un MultiPolygon avec les deux polygones
+multipolygone_69 = polygone_rhone.union(polygone_lyon)
+
+# Créer une nouvelle ligne avec insee_dep = '69' et le MultiPolygon
+dep_rhone = {
+    'insee_dep': '69',
+    'nom_dep': 'Rhône',
+    'geometry': multipolygone_69
+}
+
+# Convertir la nouvelle ligne en GeoDataFrame
+nouveau_gdf = gpd.GeoDataFrame([dep_rhone], geometry='geometry')
+
+# Supprimer les anciennes lignes avec insee_dep = '69'
+geo_df = geo_df[geo_df['insee_dep'] != '69D']
+geo_df = geo_df[geo_df['insee_dep'] != '69M']
+
+# Ajouter la nouvelle ligne au GeoDataFrame
+geo_df = gpd.GeoDataFrame(pd.concat([geo_df, nouveau_gdf], ignore_index=True), crs=geo_df.crs)
+
+geo_df = geo_df.drop_duplicates()
+
+# Replacing department names by those from the database
+for code in geo_df['insee_dep']:
+    geo_df.loc[geo_df['insee_dep']==code, 'nom_dep'] = df.loc[df['insee_dep']==code, 'nom_dep'].iloc[0]
+
+def plot_borders(department, ax):
+    if(department != None):
+        geo_df.loc[geo_df['nom_dep']==department,:].plot(edgecolor = "black", linewidth = 1, color="white", ax=ax)
 
 
 #=================================#
@@ -62,6 +117,9 @@ def plot_delaunay(delaunay_triangulation, show=True, **kwargs):
             Draw the graph in the specified Matplotlib axes.
     """
     ax = kwargs.get('ax', plt)
+    department = kwargs.get('department', None)
+
+    plot_borders(department, ax)
 
     ax.triplot(delaunay_triangulation.points[:,0], delaunay_triangulation.points[:,1], delaunay_triangulation.simplices, linewidth=1, c=EDGE_COLOR)
     ax.plot(delaunay_triangulation.points[:,0], delaunay_triangulation.points[:,1], 'o', markersize=3, c=NODE_COLOR)
@@ -75,6 +133,7 @@ def plot_delaunay(delaunay_triangulation, show=True, **kwargs):
             reset=True,
             top=False,
             right=False)
+    
     if(show):
         plt.show()
 
@@ -101,6 +160,9 @@ def plot_graph(G, pos, show=True, **kwargs):
     """
     ax = kwargs.get('ax', None)
     title = kwargs.get('title', "Delaunay Graph")
+    department = kwargs.get('department', None)
+
+    plot_borders(department, ax)
 
     nx.draw_networkx(G, pos, node_size=10, with_labels=False, node_color=NODE_COLOR, edge_color=EDGE_COLOR, ax=ax)
 
@@ -113,5 +175,6 @@ def plot_graph(G, pos, show=True, **kwargs):
             reset=True,
             top=False,
             right=False)
+    
     if(show):
         plt.show()
