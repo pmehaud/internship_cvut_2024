@@ -18,7 +18,7 @@ df = df.sample(frac=1).reset_index(drop=True)
 
 # Sample data for regions and providers
 providers = df['nom_op'].unique()
-regions = df['nom_reg'].unique()
+regions = df['nom_reg'].unique()    
 technologies = pd.Series(['site_2g', 'site_3g', 'site_4g', 'site_5g'])
 
 def select_all(variables, select_all_state):
