@@ -123,33 +123,6 @@ def quadrant_criteria(G, pos):
     """
     modif_G = copy.deepcopy(G)
     for node in tqdm(pos.keys(), desc="nodes"):
-        quadrants = create_6_quadrants(node, pos)
-        NN = set()
-        for quad in quadrants.values():
-            NN.add(nearestNeighbour(node, quad, pos)) # finding the nearest neighbour in the quadrant centered on node
-        for edge in modif_G.edges:
-            if((edge[0]==node) and (edge[1] not in NN)):
-                modif_G.remove_edges_from([edge])
-
-    return modif_G
-
-def quadrant_criteria_v2(G, pos):
-    """ Removes all the edges of G wich doesn't respect the quadrant criteria.
-        
-        Parameters
-        ----------
-        G : Graph
-            A Networkx Graph graph.
-        pos : dict
-            The position of G's nodes.
-
-        Returns
-        -------
-        modif_G : Graph
-            The modified graph.
-    """
-    modif_G = copy.deepcopy(G)
-    for node in tqdm(pos.keys(), desc="nodes"):
         neighbours = [edge[1] for edge in modif_G.edges(node)]
         edges_to_remove = list(modif_G.edges(node))
         quadrants = create_6_quadrants(node, neighbours, pos)
