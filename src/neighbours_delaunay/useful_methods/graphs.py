@@ -27,7 +27,9 @@ def delaunay_graph(df):
         pos : dict
             The position of G's nodes.
     """
-    delaunay_triangulation = Delaunay(np.array(df[['longitude', 'latitude']]))
+    points_pos = df[['longitude', 'latitude']].values
+    
+    delaunay_triangulation = Delaunay(points_pos)
 
     G = nx.Graph()
     nodes = range(len(delaunay_triangulation.points))
@@ -36,6 +38,6 @@ def delaunay_graph(df):
     for simplex in delaunay_triangulation.simplices:
         G.add_edges_from(combinations(simplex, 2))
 
-    pos = dict(zip(nodes,delaunay_triangulation.points)) # gives each node his own position
+    pos = dict(zip(df.index,points_pos)) # gives each node his own position
 
     return G, pos
