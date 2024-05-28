@@ -3,8 +3,6 @@
 #=======================#
 
 import networkx as nx # type: ignore
-# from pandas import DataFrame # type: ignore
-import numpy as np # type: ignore
 from scipy.spatial import Delaunay # type: ignore
 from itertools import combinations
 
@@ -28,7 +26,7 @@ def delaunay_graph(df):
             The position of G's nodes.
     """
     points_pos = df[['longitude', 'latitude']].values
-    
+
     delaunay_triangulation = Delaunay(points_pos)
 
     G = nx.Graph()
