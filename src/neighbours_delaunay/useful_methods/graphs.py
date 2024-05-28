@@ -3,19 +3,22 @@
 #=======================#
 
 import networkx as nx # type: ignore
+# from pandas import DataFrame # type: ignore
+import numpy as np # type: ignore
+from scipy.spatial import Delaunay # type: ignore
 from itertools import combinations
 
 #=======================================================#
 # Creation of a graph based on a delaunay triangulation #
 #=======================================================#
 
-def delaunay_to_graph(delaunay_triangulation):
+def delaunay_graph(df):
     """ Returns a Networkx Graph based on the Delaunay triangulation and the position of each node.
         
         Parameters
         ----------
-        delaunay_triangulation : Delaunay
-            Result of the Delaunay triangulation.
+        df : DataFrame
+            The pandas DataFrame of your data.
 
         Returns
         -------
@@ -24,7 +27,9 @@ def delaunay_to_graph(delaunay_triangulation):
         pos : dict
             The position of G's nodes.
     """
-    G=nx.Graph()
+    delaunay_triangulation = Delaunay(np.array(df[['longitude', 'latitude']]))
+
+    G = nx.Graph()
     nodes = range(len(delaunay_triangulation.points))
     G.add_nodes_from(nodes) # adds nodes names (0 to number_of_points-1)
 
