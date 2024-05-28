@@ -7,6 +7,7 @@ import numpy as np # type: ignore
 import pandas as pd # type: ignore
 from tqdm import tqdm # progression bar # type: ignore
 from copy import deepcopy
+from geopy import distance
 
 #=================#
 # Helpful methods #
@@ -14,26 +15,7 @@ from copy import deepcopy
 
 # for the distance criteria
 def km_distance(pt1, pt2):
-    """ Computes the distance in km between the points pt1 and pt2 (coordinates longitude, latitude).
-        
-        Parameters
-        ----------
-        pt1, pt2 : tuple
-            Coordinates of the points.
-
-        Returns
-        -------
-        distance : float
-            Distance between pt1 and pt2.
-    """
-    R = 6371  # average Earth radius in kilometers
-    dlat = math.radians(pt2[1] - pt1[1])
-    dlon = math.radians(pt2[0] - pt1[0])
-    a = math.sin(dlat/2) * math.sin(dlat/2) + math.cos(math.radians(pt1[1])) * math.cos(math.radians(pt2[1])) * math.sin(dlon/2) * math.sin(dlon/2)
-    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
-    distance = R * c
-    
-    return distance
+    return distance.distance(pt1[::-1], pt2[::-1]).km
 
 # for both quadrant and angle criterias
 def compute_angles(ref_point, adj, pos): #ref_point: name of the central point / adj: name of the adjacent nodes
