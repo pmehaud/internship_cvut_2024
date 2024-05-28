@@ -6,7 +6,7 @@ import math
 import numpy as np # type: ignore
 import pandas as pd # type: ignore
 from tqdm import tqdm # progression bar # type: ignore
-import copy
+from copy import deepcopy
 from geopy import distance
 
 #=================#
@@ -81,7 +81,7 @@ def distance_criteria(G, pos, max_distance=15):
         modif_G : Graph
             The modified graph.
     """
-    modif_G = copy.deepcopy(G)
+    modif_G = deepcopy(G)
     for edge in tqdm(modif_G.edges, desc="edges"):
         if(km_distance(pos[edge[0]],pos[edge[1]]) > max_distance):
             modif_G.remove_edges_from([edge])
@@ -103,34 +103,7 @@ def quadrant_criteria(G, pos):
         modif_G : Graph
             The modified graph.
     """
-    modif_G = copy.deepcopy(G)
-    for node in tqdm(pos.keys(), desc="nodes"):
-        quadrants = create_6_quadrants(node, pos)
-        NN = set()
-        for quad in quadrants.values():
-            NN.add(nearestNeighbour(node, quad, pos)) # finding the nearest neighbour in the quadrant centered on node
-        for edge in modif_G.edges:
-            if((edge[0]==node) and (edge[1] not in NN)):
-                modif_G.remove_edges_from([edge])
-
-    return modif_G
-
-def quadrant_criteria_v2(G, pos):
-    """ Removes all the edges of G wich doesn't respect the quadrant criteria.
-        
-        Parameters
-        ----------
-        G : Graph
-            A Networkx Graph graph.
-        pos : dict
-            The position of G's nodes.
-
-        Returns
-        -------
-        modif_G : Graph
-            The modified graph.
-    """
-    modif_G = copy.deepcopy(G)
+    modif_G = deepcopy(G)
     for node in tqdm(pos.keys(), desc="nodes"):
         neighbours = [edge[1] for edge in modif_G.edges(node)]
         edges_to_remove = list(modif_G.edges(node))
@@ -162,7 +135,7 @@ def angle_criteria(G, pos, min_angle = 30):
         modif_G : Graph
             The modified graph.
     """
-    modif_G = copy.deepcopy(G)
+    modif_G = deepcopy(G)
 
     for node in tqdm(pos.keys(), desc="nodes"):
         neighbours = [edge[1] for edge in modif_G.edges(node)]
@@ -175,9 +148,10 @@ def angle_criteria(G, pos, min_angle = 30):
                 if((angles[next_id] - angles[id]) <= min_angle):
                     angle_elim(modif_G, pos, node, neighbours, id, next_id)
                 
-        next_id = idx_angles[-1]
-        id = idx_angles[0]
-        if((360 - angles[next_id] + angles[id]) <= min_angle):
-            angle_elim(modif_G, pos, node, neighbours, id, next_id)
+        if(idx_angles.size!=0):
+            next_id = idx_angles[-1]
+            id = idx_angles[0]
+            if((360 - angles[next_id] + angles[id]) <= min_angle):
+                angle_elim(modif_G, pos, node, neighbours, id, next_id)
         
     return modif_G
