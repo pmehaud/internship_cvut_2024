@@ -166,9 +166,10 @@ def angle_criteria(G, pos, min_angle = 30):
                 if((angles[next_id] - angles[id]) <= min_angle):
                     angle_elim(modif_G, pos, node, neighbours, id, next_id)
                 
-        next_id = idx_angles[-1]
-        id = idx_angles[0]
-        if((360 - angles[next_id] + angles[id]) <= min_angle):
-            angle_elim(modif_G, pos, node, neighbours, id, next_id)
+        if(idx_angles.size!=0):
+            next_id = idx_angles[-1]
+            id = idx_angles[0]
+            if((360 - angles[next_id] + angles[id]) <= min_angle):
+                angle_elim(modif_G, pos, node, neighbours, id, next_id)
         
     return modif_G
