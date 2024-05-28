@@ -6,7 +6,7 @@ import math
 import numpy as np # type: ignore
 import pandas as pd # type: ignore
 from tqdm import tqdm # progression bar # type: ignore
-import copy
+from copy import deepcopy
 
 #=================#
 # Helpful methods #
@@ -99,7 +99,7 @@ def distance_criteria(G, pos, max_distance=15):
         modif_G : Graph
             The modified graph.
     """
-    modif_G = copy.deepcopy(G)
+    modif_G = deepcopy(G)
     for edge in tqdm(modif_G.edges, desc="edges"):
         if(km_distance(pos[edge[0]],pos[edge[1]]) > max_distance):
             modif_G.remove_edges_from([edge])
@@ -121,7 +121,7 @@ def quadrant_criteria(G, pos):
         modif_G : Graph
             The modified graph.
     """
-    modif_G = copy.deepcopy(G)
+    modif_G = deepcopy(G)
     for node in tqdm(pos.keys(), desc="nodes"):
         neighbours = [edge[1] for edge in modif_G.edges(node)]
         edges_to_remove = list(modif_G.edges(node))
@@ -153,7 +153,7 @@ def angle_criteria(G, pos, min_angle = 30):
         modif_G : Graph
             The modified graph.
     """
-    modif_G = copy.deepcopy(G)
+    modif_G = deepcopy(G)
 
     for node in tqdm(pos.keys(), desc="nodes"):
         neighbours = [edge[1] for edge in modif_G.edges(node)]

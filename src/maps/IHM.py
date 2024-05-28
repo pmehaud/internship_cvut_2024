@@ -9,7 +9,7 @@ import numpy as np
 from functools import partial
 
 import mapUtils as mu
-import copy
+from copy import deepcopy
 
 ctk.set_default_color_theme("dark-blue")
 
@@ -32,7 +32,7 @@ def plotMap():
         selected_regions = [regions[i] for i in range(len(regions)) if region_vars[i].get() == 1]
         selected_technologies = [technologies[i] for i in range(len(technologies)) if technology_vars[i].get() == 1]
 
-        map = mu.getMap(data = copy.deepcopy(df), selected_providers = selected_providers, selected_regions = selected_regions, selected_technologies = selected_technologies, option = action_var.get(), epsilon=float(epsilon_entry.get()), nmin=int(n_min_entry.get()))
+        map = mu.getMap(data = deepcopy(df), selected_providers = selected_providers, selected_regions = selected_regions, selected_technologies = selected_technologies, option = action_var.get(), epsilon=float(epsilon_entry.get()), nmin=int(n_min_entry.get()))
         # Save map to HTML file
         map_file = "temp_map"
         map.save(f"../../out/maps/{map_file}.html")
