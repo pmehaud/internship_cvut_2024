@@ -31,11 +31,13 @@ def delaunay_graph(df):
 
     G = nx.Graph()
     nodes = range(len(delaunay_triangulation.points))
-    G.add_nodes_from(nodes) # adds nodes names (0 to number_of_points-1)
+    G.add_nodes_from(nodes)
 
     for simplex in delaunay_triangulation.simplices:
         G.add_edges_from(combinations(simplex, 2))
 
-    pos = dict(zip(df.index,points_pos)) # gives each node his own position
+    G = nx.relabel_nodes(G, dict(zip(nodes, df.index))) # renaming nodes according to the indexes of the dataframe
+
+    pos = dict(zip(df.index, points_pos)) # gives each node his own position
 
     return G, pos
