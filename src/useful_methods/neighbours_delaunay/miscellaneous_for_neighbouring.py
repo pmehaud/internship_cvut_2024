@@ -2,21 +2,50 @@
 # Libraries importation #
 #=======================#
 
+from array import ArrayType
 import numpy as np # type: ignore
 from geopy import distance # type: ignore
 import pandas as pd # type: ignore
+from sklearn.cluster import HDBSCAN # type: ignore
+import networkx as nx # type: ignore
 
 
 #=================#
 # Helpful methods #
 #=================#
 
-# for the distance criteria
-def km_distance(pt1, pt2):
-    return distance.distance(pt1[::-1], pt2[::-1]).km
+def km_distance(pt1: list, pt2: list):
+    """ Computes the distance in km between pt1 and pt2.
+        
+        Parameters
+        ----------
+        pt1, pt2 : list
+            The ['latitude', 'longitude'] coordinates of the points.
 
-# for both quadrant and angle criterias
-def compute_angles(ref_point, adj, pos): #ref_point: name of the central point / adj: name of the adjacent nodes
+        Returns
+        -------
+        km_distance : float
+            The distance in km between pt1 and pt2.
+    """
+    return distance.distance(pt1, pt2).km
+
+def compute_angles(ref_point: int, adj: list, pos: dict):
+    """ Computes the angle position of ref_point's neighbours.
+        
+        Parameters
+        ----------
+        ref_point : int
+            The reference of the central point.
+        adj : list
+            An array containing references of ref_point's adjacent nodes.
+        pos : dict
+            A dictionnary referencing all points' positions.
+
+        Returns
+        -------
+        angles : np.array
+            The angle position of ref_point's neighbours (from 0 to 360°).
+    """
     angles = []
     for neighbour in adj:
         x_neighbour = pos[neighbour][0]
@@ -27,8 +56,23 @@ def compute_angles(ref_point, adj, pos): #ref_point: name of the central point /
 
     return np.array(angles)
 
-# for the quadrant criteria
 def create_6_quadrants(ref_point, adj, pos):
+    """ Creates 6 quadrants around ref_point.
+        
+        Parameters
+        ----------
+        ref_point : int
+            The reference of the central point.
+        adj : list
+            An array containing references of ref_point's adjacent nodes.
+        pos : dict
+            A dictionnary referencing all points' positions.
+
+        Returns
+        -------
+        quadrants : dict
+            A dictionnary referencing in which quadrant adj's point are.
+    """
     angles = compute_angles(ref_point, adj, pos)
 
     quadrants = dict()
@@ -37,13 +81,27 @@ def create_6_quadrants(ref_point, adj, pos):
 
     return quadrants
 
-# for both quadrant and angle criterias
-def nearestNeighbour(ref_point, neighbours, pos):
-    """Si pas de voisin, renvoie le point"""
+def nearestNeighbour(ref_point, adj, pos):
+    """ Gives the nearest neighbour around ref_point.
+        
+        Parameters
+        ----------
+        ref_point : int
+            The reference of the central point.
+        adj : list
+            An array containing references of ref_point's adjacent nodes.
+        pos : dict
+            A dictionnary referencing all points' positions.
+
+        Returns
+        -------
+        nearestNeighbour : int
+            The reference of the nearest adjacent node, if adj is empty it returns ref_point.
+    """
     min = np.inf
     nearestNeighbour = ref_point
     
-    for pt2 in neighbours:
+    for pt2 in adj:
         dist = km_distance(pos[ref_point], pos[pt2])
         if((dist > 0) and (dist < min)):
             min = dist
@@ -51,8 +109,42 @@ def nearestNeighbour(ref_point, neighbours, pos):
 
     return nearestNeighbour
 
-def angle_elim(G, pos, node, neighbours, id, next_id):
-    if(km_distance(pos[node], pos[neighbours[id]]) > km_distance(pos[node], pos[neighbours[next_id]])):
-        G.remove_edges_from([(node, neighbours[id])])
+def angle_elim(G: nx.Graph, pos: dict, ref_point: int, adj: list, id: int, next_id: int):
+    """ Computes the angle elimination for angle criteria (keeps the nearest point).
+        
+        Parameters
+        ----------
+        G : Graph
+            A Networkx Graph graph.
+        pos : dict
+            The position of G's nodes.
+        ref_point : int
+            The reference of the central point.
+        adj : list
+            An array containing references of ref_point's adjacent nodes.
+        id, next_id : int
+            The indices of the adjacent nodes ind adj.
+    """
+    if(km_distance(pos[ref_point], pos[adj[id]]) > km_distance(pos[ref_point], pos[adj[next_id]])):
+        G.remove_edges_from([(ref_point, adj[id])])
     else:
-        G.remove_edges_from([(node, neighbours[next_id])])
+        G.remove_edges_from([(ref_point, adj[next_id])])
+
+# returns the probability of base stations' city-ness
+def probaCity(coordsXY: list):
+    """ Computes the probability of base stations' city-ness using H-DBScan.
+        
+        Parameters
+        ----------
+        coordsXY : list
+            [x, y] coordinates of all points (lambert-93 projection).
+
+        Returns
+        -------
+        probaCity : pd.Series
+            A Series containing the probability of base stations' city-ness.
+    """
+    clusterer = HDBSCAN(min_cluster_size=5, min_samples=40)
+    clusterer.fit(coordsXY)
+
+    return pd.Series(data=clusterer.probabilities_, index=coordsXY.index)
