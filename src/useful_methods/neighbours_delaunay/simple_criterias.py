@@ -7,7 +7,7 @@ import pandas as pd # type: ignore
 from tqdm import tqdm # progression bar # type: ignore
 from copy import deepcopy
 
-from miscellaneous_for_neighbouring import *
+from .miscellaneous_for_neighbouring import *
 
 
 #===========#

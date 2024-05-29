@@ -13,7 +13,9 @@ from copy import deepcopy
 
 ctk.set_default_color_theme("dark-blue")
 
-df = pd.read_csv("../../database/data.csv", sep=";", decimal=',')
+df = pd.read_csv("../../../../database/data.csv", sep=";", decimal=',')
+
+
 df = df.sample(frac=1).reset_index(drop=True)
 
 # Sample data for regions and providers
