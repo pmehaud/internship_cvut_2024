@@ -34,7 +34,7 @@ def getPointsInfos(data_filtered, option, epsilon, nmin, selected_tech):
     labelsToColors=dict()
     match(option):
         case "Villes":
-            dbscan_labels=DBSCAN(eps=epsilon, min_samples=nmin).fit(data_filtered[['longitude', 'latitude']]).labels_
+            dbscan_labels=DBSCAN(eps=epsilon, min_samples=nmin).fit(data_filtered[['latitude', 'longitude']]).labels_
             labels = pd.Series(['Campagne' if label == -1 else 'Ville' for label in dbscan_labels], index=data_filtered.index)
             labelsToColors = {'Campagne': 'green', 'Ville': 'blue'}
         case "Opérateurs":
