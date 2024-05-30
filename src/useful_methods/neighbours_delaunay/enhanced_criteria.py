@@ -23,9 +23,9 @@ def distance_elim(G, pos, edge, max_distance):
     if(km_distance(pos[edge[0]],pos[edge[1]]) > max_distance):
         G.remove_edges_from([edge])
 
-#===========#
-# criteria #
-#===========#
+#==========#
+# Criteria #
+#==========#
 
 def distance_criterion_enhanced(G: nx.Graph, pos: dict, distance_range: dict = {'1': 1, '<1->0.6': 5, '<=0.6->0': 10, '0': 15}, **kwargs) -> nx.Graph:
     """ Removes all the edges of G wich are longer than the distance_range.
