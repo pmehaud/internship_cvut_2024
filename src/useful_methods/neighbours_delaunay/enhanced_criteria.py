@@ -20,10 +20,10 @@ def distance_elim(G, pos, edge, max_distance):
         G.remove_edges_from([edge])
 
 #===========#
-# Criterias #
+# criteria #
 #===========#
 
-def distance_criteria_enhanced(G: nx.Graph, pos: dict, distance_range: dict = {'1': 1, '<1->0.6': 5, '<=0.6->0': 10, '0': 15}) -> nx.Graph:
+def distance_criterion_enhanced(G: nx.Graph, pos: dict, distance_range: dict = {'1': 1, '<1->0.6': 5, '<=0.6->0': 10, '0': 15}) -> nx.Graph:
     """ Removes all the edges of G wich are longer than the distance_range.
         
         Parameters
@@ -60,8 +60,8 @@ def distance_criteria_enhanced(G: nx.Graph, pos: dict, distance_range: dict = {'
 
     return modif_G
 
-def quadrant_criteria_enhanced(G: nx.Graph, pos: dict, k_nn:int = 1) -> nx.Graph:
-    """ Removes all the edges of G wich doesn't respect the quadrant criteria.
+def quadrant_criterion_enhanced(G: nx.Graph, pos: dict, k_nn:int = 1) -> nx.Graph:
+    """ Removes all the edges of G wich doesn't respect the quadrant criterion.
         
         Parameters
         ----------
@@ -96,8 +96,8 @@ def quadrant_criteria_enhanced(G: nx.Graph, pos: dict, k_nn:int = 1) -> nx.Graph
 
     return modif_G
 
-def angle_criteria_enhanced(G: nx.Graph, pos: dict, angle_range: dict = {'1': 45, '<1->0.6': 30, '<=0.6->0': 20, '0': 15}) -> nx.Graph:
-    """ Removes all the edges of G wich doesn't respect the angle criteria.
+def angle_criterion_enhanced(G: nx.Graph, pos: dict, angle_range: dict = {'1': 45, '<1->0.6': 30, '<=0.6->0': 20, '0': 15}) -> nx.Graph:
+    """ Removes all the edges of G wich doesn't respect the angle criterion.
         
         Parameters
         ----------

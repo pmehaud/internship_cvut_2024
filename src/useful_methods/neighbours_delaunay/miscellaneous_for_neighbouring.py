@@ -109,7 +109,7 @@ def nearestNeighbour(ref_point: int, adj: list, pos: dict) -> int:
     return nearestNeighbour
 
 def angle_elim(G: nx.Graph, pos: dict, ref_point: int, adj: list, id: int, next_id: int):
-    """ Computes the angle elimination for angle criteria (keeps the nearest point).
+    """ Computes the angle elimination for angle criterion (keeps the nearest point).
         
         Parameters
         ----------
@@ -129,7 +129,6 @@ def angle_elim(G: nx.Graph, pos: dict, ref_point: int, adj: list, id: int, next_
     else:
         G.remove_edges_from([(ref_point, adj[next_id])])
 
-# returns the probability of base stations' city-ness
 def probaCity(coordsXY: list) -> pd.Series:
     """ Computes the probability of base stations' city-ness using H-DBScan.
         
