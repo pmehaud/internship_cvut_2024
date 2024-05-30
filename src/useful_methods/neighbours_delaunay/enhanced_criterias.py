@@ -6,13 +6,17 @@ import numpy as np # type: ignore
 import pandas as pd # type: ignore
 from tqdm import tqdm # progression bar # type: ignore
 from copy import deepcopy
+import math
 
 from .miscellaneous_for_neighbouring import *
 
 
 
-def compute_distance_to_quadrant(ref_point: int, adj: list, pos: dict):
-    return
+def compute_distance_to_quadrant(ref_point: int, adj: list, pos: dict, quadrant_angles):
+    angles = compute_angles(ref_point, adj, pos)
+    closest_quadrant_delimations = [quadrant_angles[np.argmin(abs(quadrant_angles-angle))] for angle in angles]
+    distances = [math.dist(pos[ref_point], pos[point]) * math.sin(abs(angle-quadrant_angle)) for angle, quadrant_angle, point in zip(angles, closest_quadrant_delimations, adj)]
+    return np.sum(distances)
     
 
 def distance_elim(G, pos, edge, max_distance):
