@@ -17,8 +17,8 @@ def distance_elim(G, pos, edge, max_distance):
 # Criterias #
 #===========#
 
-def distance_criteria_enhanced(G, pos, distance_range = {'1': 1, '<1->0.6': 2, '<=0.6->0': 5, '0': 15}):
-    """ Removes all the edges of G wich are longer than max_distance.
+def distance_criteria_enhanced(G, pos, distance_range = {'1': 1, '<1->0.6': 2.5, '<=0.6->0': 5, '0': 15}):
+    """ Removes all the edges of G wich are longer than the distance_range.
         
         Parameters
         ----------
@@ -36,17 +36,20 @@ def distance_criteria_enhanced(G, pos, distance_range = {'1': 1, '<1->0.6': 2, '
     """
     modif_G = deepcopy(G)
 
-    cityness_proba = probaCity(pd.DataFrame(data=pos.values(), columns=['lat','long'], index=pos.keys()))
+    cityness_proba = probaCity(pd.DataFrame(data=pos.values(), columns=['lat','long'], index=pos.keys())) ## Maybe make it like a global variable
     
     for node in tqdm(cityness_proba.index, desc="nodes"):
+        if(cityness_proba[node] == 0):
+            max_distance = distance_range['0']
+        elif(cityness_proba[node] == 1):
+            max_distance = distance_range['1']
+        elif((cityness_proba[node] < 1) and (cityness_proba[node] > 0.6)):
+            max_distance = distance_range['<1->0.6']
+        elif((cityness_proba[node] <= 0.6) and (cityness_proba[node] > 0)):
+            max_distance = distance_range['<=0.6->0']
+        
         for edge in G.edges(node):
-            if(cityness_proba[node] == 0):
-                distance_elim(modif_G, pos, edge, max_distance=distance_range['0'])
-            elif(cityness_proba[node] == 1):
-                distance_elim(modif_G, pos, edge, max_distance=distance_range['1'])
-            elif((cityness_proba[node] < 1) and (cityness_proba[node] > 0.6)):
-                distance_elim(modif_G, pos, edge, max_distance=distance_range['<1->0.6'])
-            elif((cityness_proba[node] <= 0.6) and (cityness_proba[node] > 0)):
-                distance_elim(modif_G, pos, edge, max_distance=distance_range['<=0.6->0'])
+            if(km_distance(pos[edge[0]],pos[edge[1]]) > max_distance):
+                modif_G.remove_edges_from([edge])
 
     return modif_G
