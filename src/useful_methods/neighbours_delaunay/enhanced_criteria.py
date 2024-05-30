@@ -10,13 +10,6 @@ import math
 
 from .miscellaneous_for_neighbouring import *
 
-
-
-def compute_distance_to_quadrant(ref_point: int, adj: list, pos: dict, quadrant_angles):
-    angles = compute_angles(ref_point, adj, pos)
-    closest_quadrant_delimations = [quadrant_angles[np.argmin(abs(quadrant_angles-angle))] for angle in angles]
-    distances = [math.dist(pos[ref_point], pos[point]) * math.sin(abs(angle-quadrant_angle)) for angle, quadrant_angle, point in zip(angles, closest_quadrant_delimations, adj)]
-    return np.sum(distances)
     
 
 def distance_elim(G, pos, edge, max_distance):
@@ -85,7 +78,7 @@ def quadrant_criterion_enhanced(G: nx.Graph, pos: dict, k_nn:int = 1) -> nx.Grap
     for node in tqdm(pos.keys(), desc="nodes"):
         neighbours = [edge[1] for edge in modif_G.edges(node)]
         edges_to_remove = list(modif_G.edges(node))
-        quadrants = create_6_quadrants(node, neighbours, pos)
+        quadrants = create_6_quadrants_enhanced(node, neighbours, pos)
 
         nb_neighbours = 0
         while(nb_neighbours < k_nn):
