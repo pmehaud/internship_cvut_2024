@@ -7,7 +7,7 @@ from geopy import distance # type: ignore
 import pandas as pd # type: ignore
 from sklearn.cluster import HDBSCAN # type: ignore
 import networkx as nx # type: ignore
-
+import math
 
 #=================#
 # Helpful methods #
@@ -77,6 +77,59 @@ def create_6_quadrants(ref_point: int, adj: list, pos: dict) -> dict:
     quadrants = dict()
     for ind in range(0, 301, 60):
         quadrants[f"{ind}_{ind+60}"] = [adj[k] for k in np.where((angles >= ind) & (angles < ind + 60))[0]] # to have the real name of the node
+
+    return quadrants
+
+def compute_distance_to_quadrant(ref_point: int, adj: list, pos: dict, angles: list, gap: int) -> float:
+    """ Computes the sum of the distances of each point to its closest quadrant edge.
+        
+        Parameters
+        ----------
+        ref_point : int
+            The reference of the central point.
+        adj : list
+            An array containing references of ref_point's adjacent nodes.
+        pos : dict
+            A dictionnary referencing all points' positions.
+        angles : list
+            An array containing angles from ref_point to ref_point's adjacent nodes.
+        gap : int
+            The angle gap of the quadrant.
+
+        Returns
+        -------
+        distance : float
+            The sum of the distances of each point to its closest quadrant edge.    
+    """
+    quadrant_angles = [angle + gap for angle in range(0, 301, 60)]
+    closest_quadrant_delimations = [quadrant_angles[np.argmin((360 + (quadrant_angles-angle) % 360))] for angle in angles]
+    distances = [math.dist(pos[ref_point], pos[point]) * math.sin(abs(angle-quadrant_angle)) for angle, quadrant_angle, point in zip(angles, closest_quadrant_delimations, adj)]
+    return np.sum(distances)
+
+def create_6_quadrants_enhanced(ref_point: int, adj: list, pos: dict) -> dict:
+    """ Creates 6 quadrants around ref_point, with an angle optimized angle gap (quadrant doesn't always start at 0 degrees).
+        
+        Parameters
+        ----------
+        ref_point : int
+            The reference of the central point.
+        adj : list
+            An array containing references of ref_point's adjacent nodes.
+        pos : dict
+            A dictionnary referencing all points' positions.
+
+        Returns
+        -------
+        quadrants : dict
+            A dictionnary referencing in which quadrant adj's point are.
+    """
+    angles = compute_angles(ref_point, adj, pos)
+    gaps = range(0, 61, 10)
+    distances = [compute_distance_to_quadrant(ref_point, adj, pos, angles, gap) for gap in gaps]
+    selected_gap = gaps[np.argmax(distances)]
+    quadrants = dict()
+    for ind in range(0, 301, 60):
+        quadrants[f"{ind}_{ind+60}"] = [adj[k] for k in np.where((angles >= ind + selected_gap) & (angles < ind + selected_gap + 60))[0]] # to have the real name of the node
 
     return quadrants
 
