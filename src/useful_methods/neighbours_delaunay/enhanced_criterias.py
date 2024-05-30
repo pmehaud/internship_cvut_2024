@@ -9,6 +9,12 @@ from copy import deepcopy
 
 from .miscellaneous_for_neighbouring import *
 
+
+
+def compute_distance_to_quadrant(ref_point: int, adj: list, pos: dict):
+    return
+    
+
 def distance_elim(G, pos, edge, max_distance):
     if(km_distance(pos[edge[0]],pos[edge[1]]) > max_distance):
         G.remove_edges_from([edge])
