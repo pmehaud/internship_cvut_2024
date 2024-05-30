@@ -17,7 +17,7 @@ def distance_elim(G, pos, edge, max_distance):
 # Criterias #
 #===========#
 
-def distance_criteria_enhanced(G, pos, distance_range = {'1': 1, '<1->0.6': 5, '<=0.6->0': 10, '0': 15}):
+def distance_criteria_enhanced(G: nx.Graph, pos: dict, distance_range: dict = {'1': 1, '<1->0.6': 5, '<=0.6->0': 10, '0': 15}) -> nx.Graph:
     """ Removes all the edges of G wich are longer than the distance_range.
         
         Parameters
@@ -26,7 +26,7 @@ def distance_criteria_enhanced(G, pos, distance_range = {'1': 1, '<1->0.6': 5, '
             A Networkx Graph graph.
         pos : dict
             The position of G's nodes.
-        distance_range : list<floats>
+        distance_range : dict<floats>
             The maximum distance between two connected nodes (in km), according to the city-ness probability.
 
         Returns
@@ -54,7 +54,7 @@ def distance_criteria_enhanced(G, pos, distance_range = {'1': 1, '<1->0.6': 5, '
 
     return modif_G
 
-def angle_criteria_enhanced(G, pos, angle_range = {'1': 45, '<1->0.6': 30, '<=0.6->0': 20, '0': 15}):
+def angle_criteria_enhanced(G: nx.Graph, pos: dict, angle_range: dict = {'1': 45, '<1->0.6': 30, '<=0.6->0': 20, '0': 15}) -> nx.Graph:
     """ Removes all the edges of G wich doesn't respect the angle criteria.
         
         Parameters
