@@ -85,7 +85,7 @@ def quadrant_criterion_enhanced(G: nx.Graph, pos: dict, k_nn: int = 1) -> nx.Gra
         while(nb_neighbours < k_nn):
             for quad in quadrants.values():
                 nearest_neighbour = nearestNeighbour(node, quad, pos)
-                if((len(quad) > nb_neighbours) and (nearest_neighbour != node)):
+                if(nearest_neighbour != node):
                     edges_to_remove.remove((node, nearest_neighbour)) # removing the nearest neighbour in the quadrant centered on node from the edges to remove
                     quad.remove(nearest_neighbour)
             nb_neighbours += 1
