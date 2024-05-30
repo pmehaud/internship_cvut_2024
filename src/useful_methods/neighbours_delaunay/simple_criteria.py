@@ -10,9 +10,9 @@ from copy import deepcopy
 from .miscellaneous_for_neighbouring import *
 
 
-#===========#
-# criteria #
-#===========#
+#==========#
+# Criteria #
+#==========#
 
 def distance_criterion(G: nx.Graph, pos: dict, max_distance: int = 15) -> nx.Graph:
     """ Removes all the edges of G wich are longer than max_distance.

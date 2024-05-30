@@ -16,11 +16,11 @@ def distance_elim(G, pos, edge, max_distance):
     if(km_distance(pos[edge[0]],pos[edge[1]]) > max_distance):
         G.remove_edges_from([edge])
 
-#===========#
-# criteria #
-#===========#
+#==========#
+# Criteria #
+#==========#
 
-def distance_criterion_enhanced(G: nx.Graph, pos: dict, distance_range: dict = {'1': 1, '<1->0.6': 5, '<=0.6->0': 10, '0': 15}) -> nx.Graph:
+def distance_criterion_enhanced(G: nx.Graph, pos: dict, distance_range: dict = {'1': 1, '<1->0.6': 5, '<=0.6->0': 10, '0': 15}, **kwargs) -> nx.Graph:
     """ Removes all the edges of G wich are longer than the distance_range.
         
         Parameters
@@ -37,9 +37,9 @@ def distance_criterion_enhanced(G: nx.Graph, pos: dict, distance_range: dict = {
         modif_G : Graph
             The modified graph.
     """
+    cityness_proba = kwargs.get('cityness_proba', probaCity(pd.DataFrame(data=pos.values(), columns=['lat','long'], index=pos.keys())))
+    
     modif_G = deepcopy(G)
-
-    cityness_proba = probaCity(pd.DataFrame(data=pos.values(), columns=['lat','long'], index=pos.keys())) ## Maybe make it like a global variable
     
     for node in tqdm(cityness_proba.index, desc="nodes"):
         if(cityness_proba[node] == 0):
@@ -57,7 +57,7 @@ def distance_criterion_enhanced(G: nx.Graph, pos: dict, distance_range: dict = {
 
     return modif_G
 
-def quadrant_criterion_enhanced(G: nx.Graph, pos: dict, k_nn:int = 1) -> nx.Graph:
+def quadrant_criterion_enhanced(G: nx.Graph, pos: dict, k_nn: int = 1) -> nx.Graph:
     """ Removes all the edges of G wich doesn't respect the quadrant criterion.
         
         Parameters
@@ -75,6 +75,7 @@ def quadrant_criterion_enhanced(G: nx.Graph, pos: dict, k_nn:int = 1) -> nx.Grap
             The modified graph.
     """
     modif_G = deepcopy(G)
+
     for node in tqdm(pos.keys(), desc="nodes"):
         neighbours = [edge[1] for edge in modif_G.edges(node)]
         edges_to_remove = list(modif_G.edges(node))
@@ -93,7 +94,7 @@ def quadrant_criterion_enhanced(G: nx.Graph, pos: dict, k_nn:int = 1) -> nx.Grap
 
     return modif_G
 
-def angle_criterion_enhanced(G: nx.Graph, pos: dict, angle_range: dict = {'1': 45, '<1->0.6': 30, '<=0.6->0': 20, '0': 15}) -> nx.Graph:
+def angle_criterion_enhanced(G: nx.Graph, pos: dict, angle_range: dict = {'1': 45, '<1->0.6': 30, '<=0.6->0': 20, '0': 15}, **kwargs) -> nx.Graph:
     """ Removes all the edges of G wich doesn't respect the angle criterion.
         
         Parameters
@@ -110,9 +111,9 @@ def angle_criterion_enhanced(G: nx.Graph, pos: dict, angle_range: dict = {'1': 4
         modif_G : Graph
             The modified graph.
     """
+    cityness_proba = kwargs.get('cityness_proba', probaCity(pd.DataFrame(data=pos.values(), columns=['lat','long'], index=pos.keys())))
+    
     modif_G = deepcopy(G)
-
-    cityness_proba = probaCity(pd.DataFrame(data=pos.values(), columns=['lat','long'], index=pos.keys()))
 
     for node in tqdm(cityness_proba.index, desc="nodes"):
         if(cityness_proba[node] == 0):
