@@ -2,7 +2,6 @@
 # Libraries importation #
 #=======================#
 
-from array import ArrayType
 import numpy as np # type: ignore
 from geopy import distance # type: ignore
 import pandas as pd # type: ignore
