@@ -24,10 +24,10 @@ def distance_elim(G, pos, edge, max_distance):
         G.remove_edges_from([edge])
 
 #===========#
-# Criterias #
+# criteria #
 #===========#
 
-def distance_criteria_enhanced(G, pos, distance_range = {'1': 1, '<1->0.6': 5, '<=0.6->0': 10, '0': 15}):
+def distance_criterion_enhanced(G: nx.Graph, pos: dict, distance_range: dict = {'1': 1, '<1->0.6': 5, '<=0.6->0': 10, '0': 15}) -> nx.Graph:
     """ Removes all the edges of G wich are longer than the distance_range.
         
         Parameters
@@ -36,7 +36,7 @@ def distance_criteria_enhanced(G, pos, distance_range = {'1': 1, '<1->0.6': 5, '
             A Networkx Graph graph.
         pos : dict
             The position of G's nodes.
-        distance_range : list<floats>
+        distance_range : dict<floats>
             The maximum distance between two connected nodes (in km), according to the city-ness probability.
 
         Returns
@@ -64,8 +64,44 @@ def distance_criteria_enhanced(G, pos, distance_range = {'1': 1, '<1->0.6': 5, '
 
     return modif_G
 
-def angle_criteria_enhanced(G, pos, angle_range = {'1': 45, '<1->0.6': 30, '<=0.6->0': 20, '0': 15}):
-    """ Removes all the edges of G wich doesn't respect the angle criteria.
+def quadrant_criterion_enhanced(G: nx.Graph, pos: dict, k_nn:int = 1) -> nx.Graph:
+    """ Removes all the edges of G wich doesn't respect the quadrant criterion.
+        
+        Parameters
+        ----------
+        G : Graph
+            A Networkx Graph graph.
+        pos : dict
+            The position of G's nodes.
+        k_nn: int
+            How much neighbours you want to keep per quadrant.
+
+        Returns
+        -------
+        modif_G : Graph
+            The modified graph.
+    """
+    modif_G = deepcopy(G)
+    for node in tqdm(pos.keys(), desc="nodes"):
+        neighbours = [edge[1] for edge in modif_G.edges(node)]
+        edges_to_remove = list(modif_G.edges(node))
+        quadrants = create_6_quadrants(node, neighbours, pos)
+
+        nb_neighbours = 0
+        while(nb_neighbours < k_nn):
+            for quad in quadrants.values():
+                nearest_neighbour = nearestNeighbour(node, quad, pos)
+                if((len(quad) > nb_neighbours) and (nearest_neighbour != node)):
+                    edges_to_remove.remove((node, nearest_neighbour)) # removing the nearest neighbour in the quadrant centered on node from the edges to remove
+                    quad.remove(nearest_neighbour)
+            nb_neighbours += 1
+        
+        modif_G.remove_edges_from(edges_to_remove)
+
+    return modif_G
+
+def angle_criterion_enhanced(G: nx.Graph, pos: dict, angle_range: dict = {'1': 45, '<1->0.6': 30, '<=0.6->0': 20, '0': 15}) -> nx.Graph:
+    """ Removes all the edges of G wich doesn't respect the angle criterion.
         
         Parameters
         ----------

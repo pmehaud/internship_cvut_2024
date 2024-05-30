@@ -2,7 +2,6 @@
 # Libraries importation #
 #=======================#
 
-from array import ArrayType
 import numpy as np # type: ignore
 from geopy import distance # type: ignore
 import pandas as pd # type: ignore
@@ -14,7 +13,7 @@ import networkx as nx # type: ignore
 # Helpful methods #
 #=================#
 
-def km_distance(pt1: list, pt2: list):
+def km_distance(pt1: list, pt2: list) -> float:
     """ Computes the distance in km between pt1 and pt2.
         
         Parameters
@@ -29,7 +28,7 @@ def km_distance(pt1: list, pt2: list):
     """
     return distance.distance(pt1, pt2).km
 
-def compute_angles(ref_point: int, adj: list, pos: dict):
+def compute_angles(ref_point: int, adj: list, pos: dict) -> np.array:
     """ Computes the angle position of ref_point's neighbours.
         
         Parameters
@@ -56,7 +55,7 @@ def compute_angles(ref_point: int, adj: list, pos: dict):
 
     return np.array(angles)
 
-def create_6_quadrants(ref_point, adj, pos):
+def create_6_quadrants(ref_point: int, adj: list, pos: dict) -> dict:
     """ Creates 6 quadrants around ref_point.
         
         Parameters
@@ -81,7 +80,7 @@ def create_6_quadrants(ref_point, adj, pos):
 
     return quadrants
 
-def nearestNeighbour(ref_point, adj, pos):
+def nearestNeighbour(ref_point: int, adj: list, pos: dict) -> int:
     """ Gives the nearest neighbour around ref_point.
         
         Parameters
@@ -110,7 +109,7 @@ def nearestNeighbour(ref_point, adj, pos):
     return nearestNeighbour
 
 def angle_elim(G: nx.Graph, pos: dict, ref_point: int, adj: list, id: int, next_id: int):
-    """ Computes the angle elimination for angle criteria (keeps the nearest point).
+    """ Computes the angle elimination for angle criterion (keeps the nearest point).
         
         Parameters
         ----------
@@ -130,8 +129,7 @@ def angle_elim(G: nx.Graph, pos: dict, ref_point: int, adj: list, id: int, next_
     else:
         G.remove_edges_from([(ref_point, adj[next_id])])
 
-# returns the probability of base stations' city-ness
-def probaCity(coordsXY: list):
+def probaCity(coordsXY: list) -> pd.Series:
     """ Computes the probability of base stations' city-ness using H-DBScan.
         
         Parameters

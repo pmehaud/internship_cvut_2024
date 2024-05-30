@@ -11,10 +11,10 @@ from .miscellaneous_for_neighbouring import *
 
 
 #===========#
-# Criterias #
+# criteria #
 #===========#
 
-def distance_criteria(G, pos, max_distance=15):
+def distance_criterion(G: nx.Graph, pos: dict, max_distance: int = 15) -> nx.Graph:
     """ Removes all the edges of G wich are longer than max_distance.
         
         Parameters
@@ -38,8 +38,8 @@ def distance_criteria(G, pos, max_distance=15):
 
     return modif_G
 
-def quadrant_criteria(G, pos):
-    """ Removes all the edges of G wich doesn't respect the quadrant criteria.
+def quadrant_criterion(G: nx.Graph, pos: dict) -> nx.Graph:
+    """ Removes all the edges of G wich doesn't respect the quadrant criterion.
         
         Parameters
         ----------
@@ -68,8 +68,8 @@ def quadrant_criteria(G, pos):
 
     return modif_G
 
-def angle_criteria(G, pos, min_angle = 30):
-    """ Removes all the edges of G wich doesn't respect the angle criteria.
+def angle_criterion(G: nx.Graph, pos: dict, min_angle: int = 30) -> nx.Graph:
+    """ Removes all the edges of G wich doesn't respect the angle criterion.
         
         Parameters
         ----------
