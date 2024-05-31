@@ -102,7 +102,7 @@ def compute_distance_to_quadrant(ref_point: int, adj: list, pos: dict, angles: l
             The sum of the distances of each point to its closest quadrant edge.    
     """
     quadrant_angles = [angle + gap for angle in range(0, 301, 60)]
-    closest_quadrant_delimations = [quadrant_angles[np.argmin((360 + (quadrant_angles-angle) % 360))] for angle in angles]
+    closest_quadrant_delimations = [quadrant_angles[np.argmin((np.abs((quadrant_angles-angle) % 360)))] for angle in angles]
     distances = [math.dist(pos[ref_point], pos[point]) * math.sin(abs(angle-quadrant_angle)) for angle, quadrant_angle, point in zip(angles, closest_quadrant_delimations, adj)]
     return np.sum(distances)
 
@@ -124,12 +124,15 @@ def create_6_quadrants_enhanced(ref_point: int, adj: list, pos: dict) -> dict:
             A dictionnary referencing in which quadrant adj's point are.
     """
     angles = compute_angles(ref_point, adj, pos)
-    gaps = range(0, 61, 10)
+    gaps = range(0, 60, 5)
     distances = [compute_distance_to_quadrant(ref_point, adj, pos, angles, gap) for gap in gaps]
     selected_gap = gaps[np.argmax(distances)]
+
+    angles = angles + selected_gap
+    angles = angles % 360 
     quadrants = dict()
     for ind in range(0, 301, 60):
-        quadrants[f"{ind}_{ind+60}"] = [adj[k] for k in np.where((angles >= ind + selected_gap) & (angles < ind + selected_gap + 60))[0]] # to have the real name of the node
+        quadrants[f"{ind}_{ind+60}"] = [adj[k] for k in np.where((angles >= ind) & (angles < ind + 60))[0]] # to have the real name of the node
 
     return quadrants
 
