@@ -25,7 +25,7 @@ def delaunay_graph(df):
         pos : dict
             The position of G's nodes.
     """
-    points_pos = df[['longitude', 'latitude']].values
+    points_pos = df[['latitude', 'longitude']].values
 
     delaunay_triangulation = Delaunay(points_pos)
 
