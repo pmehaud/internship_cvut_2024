@@ -198,7 +198,7 @@ def probaCity(coordsXY: list) -> pd.Series:
         probaCity : pd.Series
             A Series containing the probability of base stations' city-ness.
     """
-    clusterer = HDBSCAN(min_cluster_size=5, min_samples=40)
+    clusterer = HDBSCAN(min_cluster_size=4, min_samples=7, alpha=10)
     clusterer.fit(coordsXY)
 
     return pd.Series(data=clusterer.probabilities_, index=coordsXY.index)
