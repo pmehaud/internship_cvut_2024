@@ -199,17 +199,17 @@ def probaCity(coordsXY: list, n_neighbors: int = 4) -> pd.Series:
         probaCity : pd.Series
             A Series containing the probability of base stations' city-ness.
     """
-    nbrs = NearestNeighbors(n_neighbors=n_neighbors+1).fit(coordsXY)  # n_neighbors+1 because considering himself
-    distances, indices = nbrs.kneighbors(coordsXY)
+    # nbrs = NearestNeighbors(n_neighbors=n_neighbors+1).fit(coordsXY)  # n_neighbors+1 because considering himself
+    # distances, indices = nbrs.kneighbors(coordsXY)
 
     # Calculer la moyenne des distances des k plus proches voisins pour chaque point
-    mean_distances = np.mean(distances[:, 1:], axis=1)  # on exclut la première colonne car c'est la distance à soi-même
-    density_proba = mean_distances/np.max(mean_distances)
-    print(density_proba)
+    # mean_distances = np.mean(distances[:, 1:], axis=1)  # on exclut la première colonne car c'est la distance à soi-même
+    # density_proba = (np.max(mean_distances) - mean_distances) / np.max(mean_distances)
 
-    # clusterer = HDBSCAN(min_cluster_size=5, min_samples=40)
-    # clusterer.fit(coordsXY)
+    clusterer = HDBSCAN(min_cluster_size=5, min_samples=40)
+    clusterer.fit(coordsXY)
 
     # probas = 
 
-    return pd.Series(data=density_proba, index=coordsXY.index)
+    return pd.Series(data=clusterer.probabilities_, index=coordsXY.index)
+    
