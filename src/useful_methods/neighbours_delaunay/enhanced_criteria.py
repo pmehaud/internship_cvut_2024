@@ -41,7 +41,7 @@ def distance_criterion_enhanced(G: nx.Graph, pos: dict, distance_range: dict = {
     
     modif_G = deepcopy(G)
     
-    for node in tqdm(cityness_proba.index, desc="nodes"):
+    for node in tqdm(pos.keys(), desc="nodes - distance"):
         if(cityness_proba[node] == 0):
             max_distance = distance_range['0']
         elif(cityness_proba[node] == 1):
@@ -76,7 +76,7 @@ def quadrant_criterion_enhanced(G: nx.Graph, pos: dict, k_nn: int = 1) -> nx.Gra
     """
     modif_G = deepcopy(G)
 
-    for node in tqdm(pos.keys(), desc="nodes"):
+    for node in tqdm(pos.keys(), desc="nodes - quadrant"):
         neighbours = [edge[1] for edge in modif_G.edges(node)]
         edges_to_remove = list(modif_G.edges(node))
         quadrants = create_6_quadrants_enhanced(node, neighbours, pos)
@@ -115,7 +115,7 @@ def angle_criterion_enhanced(G: nx.Graph, pos: dict, angle_range: dict = {'1': 4
     
     modif_G = deepcopy(G)
 
-    for node in tqdm(cityness_proba.index, desc="nodes"):
+    for node in tqdm(pos.keys(), desc="nodes - angles"):
         if(cityness_proba[node] == 0):
             min_angle = angle_range['0']
         elif(cityness_proba[node] == 1):

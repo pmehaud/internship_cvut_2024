@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt # type: ignore
 import networkx as nx # type: ignore
 import pandas as pd # type: ignore
 # import geopandas as gpd # type: ignore
+from copy import deepcopy
 
 #==================#
 # Global variables #
@@ -162,12 +163,17 @@ def plot_graph(G, pos, show=True, **kwargs):
     title = kwargs.get('title', "Delaunay Graph")
     # department = kwargs.get('department', None)
 
+    pos_copy = deepcopy(pos)
+
+    for k in pos_copy.keys():
+        pos_copy[k] = pos_copy[k][::-1] # to have values in pos shaped like ['long', 'lat'] instead of ['lat', 'long']
+
     # plot_borders(department, ax)
 
-    nx.draw_networkx(G, pos, node_size=10, with_labels=False, node_color=NODE_COLOR, edge_color=EDGE_COLOR, ax=ax)
+    nx.draw_networkx(G, pos_copy, node_size=10, with_labels=False, node_color=NODE_COLOR, edge_color=EDGE_COLOR, ax=ax)
 
     if(ax):
-        plot_params(title, ax, [pos[k][0] for k in pos], [pos[k][1] for k in pos])
+        plot_params(title, ax, [pos_copy[k][0] for k in pos], [pos_copy[k][1] for k in pos])
     else:
         plt.xlabel("Longitude")
         plt.ylabel("Latitude")
