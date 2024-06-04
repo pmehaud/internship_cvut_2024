@@ -28,7 +28,7 @@ def distance_elim(G, pos, edge, max_distance):
 # Criteria #
 #==========#
 
-def distance_criterion_enhanced(G: nx.Graph, pos: dict, distance_range: dict = {'1': 1, '<1->0.6': 5, '<=0.6->0': 10, '0': 15}, **kwargs) -> nx.Graph:
+def distance_criterion_enhanced(G: nx.Graph, pos: dict, distance_range: dict = {'1': 1, '<1->0.6': 7, '<=0.6->0': 10, '0': 15}, **kwargs) -> nx.Graph:
     """ Removes all the edges of G wich are longer than the distance_range.
         
         Parameters
@@ -138,9 +138,9 @@ def angle_criterion_enhanced(G: nx.Graph, pos: dict, angle_range: dict = {'1': 4
         #     min_angle = angle_range['<=0.6->0']
 
         if(mean_distances[node] <= 1.0):
-            min_angle = 45
+            min_angle = 40
         elif((mean_distances[node] > 1) and (mean_distances[node] <= 2)):
-            min_angle = 35
+            min_angle = 30
         elif((mean_distances[node] > 2) and (mean_distances[node] <= 5)):
             min_angle = 25
         elif((mean_distances[node] > 5) and (mean_distances[node] <= 10)):
