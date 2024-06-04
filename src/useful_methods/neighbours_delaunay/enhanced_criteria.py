@@ -111,19 +111,34 @@ def angle_criterion_enhanced(G: nx.Graph, pos: dict, angle_range: dict = {'1': 4
         modif_G : Graph
             The modified graph.
     """
-    cityness_proba = kwargs.get('cityness_proba', probaCity(pd.DataFrame(data=pos.values(), columns=['lat','long'], index=pos.keys())))
+    mean_distances = kwargs.get('mean_distance_to_NN', None)
+    if(not(mean_distances)):
+       mean_distances = mean_distance_to_NN(pd.DataFrame(data=pos.values(), columns=['lat','long'], index=pos.keys()))
     
     modif_G = deepcopy(G)
 
     for node in tqdm(pos.keys(), desc="nodes - angles"):
-        if(cityness_proba[node] == 0):
-            min_angle = angle_range['0']
-        elif(cityness_proba[node] == 1):
-            min_angle = angle_range['1']
-        elif((cityness_proba[node] < 1) and (cityness_proba[node] > 0.6)):
-            min_angle = angle_range['<1->0.6']
-        elif((cityness_proba[node] <= 0.6) and (cityness_proba[node] > 0)):
-            min_angle = angle_range['<=0.6->0']
+        # if(cityness_proba[node] == 0):
+        #     min_angle = angle_range['0']
+        # elif(cityness_proba[node] == 1):
+        #     min_angle = angle_range['1']
+        # elif((cityness_proba[node] < 1) and (cityness_proba[node] > 0.6)):
+        #     min_angle = angle_range['<1->0.6']
+        # elif((cityness_proba[node] <= 0.6) and (cityness_proba[node] > 0)):
+        #     min_angle = angle_range['<=0.6->0']
+
+        if(mean_distances[node] <= 1.0):
+            min_angle = 45
+        elif((mean_distances[node] > 1) and (mean_distances[node] <= 2)):
+            min_angle = 35
+        elif((mean_distances[node] > 2) and (mean_distances[node] <= 5)):
+            min_angle = 25
+        elif((mean_distances[node] > 5) and (mean_distances[node] <= 10)):
+            min_angle = 15
+        elif((mean_distances[node] > 10) and (mean_distances[node] <= 15)):
+            min_angle = 10
+        else:
+            min_angle = 5
 
         neighbours = [edge[1] for edge in modif_G.edges(node)]
         angles = compute_angles(node, neighbours, pos)

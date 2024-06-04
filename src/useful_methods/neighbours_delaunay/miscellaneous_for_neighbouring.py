@@ -186,30 +186,25 @@ def angle_elim(G: nx.Graph, pos: dict, ref_point: int, adj: list, id: int, next_
     else:
         G.remove_edges_from([(ref_point, adj[next_id])])
 
-def probaCity(coordsXY: list, n_neighbors: int = 4) -> pd.Series:
-    """ Computes the probability of base stations' city-ness using H-DBScan.
+def mean_distance_to_NN(coordsXY: list, n_neighbours: int = 4) -> pd.Series:
+    """ Computes the mean distance to the n_neighbours.
         
         Parameters
         ----------
         coordsXY : list
             [x, y] coordinates of all points (lambert-93 projection).
+        n_neighbours : int (default=4)
+            Number of nearest neighbours.
 
         Returns
         -------
-        probaCity : pd.Series
-            A Series containing the probability of base stations' city-ness.
+        mean_distances : pd.Series
+            A Series containing the mean_distances to base stations' nearest neighbours.
     """
-    # nbrs = NearestNeighbors(n_neighbors=n_neighbors+1).fit(coordsXY)  # n_neighbors+1 because considering himself
-    # distances, indices = nbrs.kneighbors(coordsXY)
+    nbrs = NearestNeighbors(n_neighbors=n_neighbours+1, metric=lambda x, y : distance.distance(x[::-1], y[::-1]).km).fit(coordsXY)  # n_neighbors+1 because considering himself
+    distances, _ = nbrs.kneighbors(coordsXY)
+    
+    mean_distances = np.mean(distances[:, 1:], axis=1)  # we exclude the first element (distance to ourself is 0)
 
-    # Calculer la moyenne des distances des k plus proches voisins pour chaque point
-    # mean_distances = np.mean(distances[:, 1:], axis=1)  # on exclut la première colonne car c'est la distance à soi-même
-    # density_proba = (np.max(mean_distances) - mean_distances) / np.max(mean_distances)
-
-    clusterer = HDBSCAN(min_cluster_size=5, min_samples=40)
-    clusterer.fit(coordsXY)
-
-    # probas = 
-
-    return pd.Series(data=clusterer.probabilities_, index=coordsXY.index)
+    return pd.Series(data=mean_distances, index=coordsXY.index)
     
