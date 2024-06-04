@@ -45,7 +45,9 @@ def distance_criterion_enhanced(G: nx.Graph, pos: dict, distance_range: dict = {
         modif_G : Graph
             The modified graph.
     """
-    cityness_proba = kwargs.get('cityness_proba', city_detection(pd.DataFrame(data=pos.values(), columns=['lat','long'], index=pos.keys()))['probas'])
+    cityness_proba = kwargs.get('cityness_proba', None)
+    if(cityness_proba is None):
+        cityness_proba = city_detection(pd.DataFrame(data=pos.values(), columns=['lat','long'], index=pos.keys()))['probas']
     
     modif_G = deepcopy(G)
     
