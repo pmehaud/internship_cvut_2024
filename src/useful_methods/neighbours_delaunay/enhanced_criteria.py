@@ -45,7 +45,7 @@ def distance_criterion_enhanced(G: nx.Graph, pos: dict, distance_range: dict = {
         modif_G : Graph
             The modified graph.
     """
-    cityness_proba = kwargs.get('cityness_proba', city_detection(pd.DataFrame(data=pos.values(), columns=['lat','long'], index=pos.keys())['proba']))
+    cityness_proba = kwargs.get('cityness_proba', city_detection(pd.DataFrame(data=pos.values(), columns=['lat','long'], index=pos.keys()))['probas'])
     
     modif_G = deepcopy(G)
     
@@ -120,7 +120,7 @@ def angle_criterion_enhanced(G: nx.Graph, pos: dict, angle_range: dict = {'1': 4
             The modified graph.
     """
     mean_distances = kwargs.get('mean_distance_to_NN', None)
-    if(not(mean_distances)):
+    if(mean_distances is None):
        mean_distances = mean_distance_to_NN(pd.DataFrame(data=pos.values(), columns=['lat','long'], index=pos.keys()))
     
     modif_G = deepcopy(G)
