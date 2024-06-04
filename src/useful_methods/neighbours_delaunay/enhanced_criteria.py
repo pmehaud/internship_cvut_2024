@@ -17,7 +17,7 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 # Add the directory of 'city' to the sys.path
 sys.path.append(os.path.join(current_dir, 'city'))
 from .miscellaneous_for_neighbouring import *
-from city.city_utils import city_detection
+from city.city_utils import city_detection_enhanced
     
 
 def distance_elim(G, pos, edge, max_distance):
@@ -45,7 +45,7 @@ def distance_criterion_enhanced(G: nx.Graph, pos: dict, distance_range: dict = {
         modif_G : Graph
             The modified graph.
     """
-    cityness_proba = kwargs.get('cityness_proba', city_detection(pd.DataFrame(data=pos.values(), columns=['lat','long'], index=pos.keys()))['probas'])
+    cityness_proba = kwargs.get('cityness_proba', city_detection_enhanced(pd.DataFrame(data=pos.values(), columns=['lat','long'], index=pos.keys()))['probas'])
     
     modif_G = deepcopy(G)
     
