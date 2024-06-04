@@ -5,9 +5,8 @@
 import numpy as np # type: ignore
 from geopy import distance # type: ignore
 import pandas as pd # type: ignore
-from sklearn.cluster import HDBSCAN
-from sklearn.neighbors import NearestNeighbors
 import networkx as nx # type: ignore
+from sklearn.neighbors import NearestNeighbors # type: ignore
 import math
 
 #=================#
