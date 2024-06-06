@@ -28,7 +28,7 @@ def distance_elim(G, pos, edge, max_distance):
 # Criteria #
 #==========#
 
-def distance_criterion_enhanced(G: nx.Graph, pos: dict, distance_range: dict = {'1': 1.3, '<1->0.6': 7, '<=0.6->0': 10, '0': 15}, **kwargs) -> nx.Graph:
+def distance_criterion_enhanced(G: nx.Graph, pos: dict, params: dict, **kwargs) -> nx.Graph:
     """ Removes all the edges of G wich are longer than the distance_range.
         
         Parameters
@@ -37,8 +37,8 @@ def distance_criterion_enhanced(G: nx.Graph, pos: dict, distance_range: dict = {
             A Networkx Graph graph.
         pos : dict
             The position of G's nodes.
-        distance_range : dict<floats>
-            The maximum distance between two connected nodes (in km), according to the city-ness probability.
+        params : dict<dict>
+            ??? .
 
         Returns
         -------
@@ -64,17 +64,7 @@ def distance_criterion_enhanced(G: nx.Graph, pos: dict, distance_range: dict = {
         #     max_distance = distance_range['<1->0.6']
         # elif((cityness_proba[node] <= 0.6) and (cityness_proba[node] > 0)):
         #     max_distance = distance_range['<=0.6->0']
-        
-        if(mean_distances[node] <= 1.0):
-            max_distance = 2
-        elif((mean_distances[node] > 1) and (mean_distances[node] <= 2)):
-            max_distance = 5
-        elif((mean_distances[node] > 2) and (mean_distances[node] <= 5)):
-            max_distance = 10
-        elif((mean_distances[node] > 5) and (mean_distances[node] <= 10)):
-            max_distance = 15
-        else:
-            max_distance = 15
+        max_distance = mean_distance_choice(node, mean_distances, params, 'distance')
         
         for edge in G.edges(node):
             if(km_distance(pos[edge[0]],pos[edge[1]]) > max_distance):
@@ -119,7 +109,7 @@ def quadrant_criterion_enhanced(G: nx.Graph, pos: dict, k_nn: int = 1) -> nx.Gra
 
     return modif_G
 
-def angle_criterion_enhanced(G: nx.Graph, pos: dict, angle_range: dict = {'1': 45, '<1->0.6': 30, '<=0.6->0': 20, '0': 15}, **kwargs) -> nx.Graph:
+def angle_criterion_enhanced(G: nx.Graph, pos: dict, params: dict, **kwargs) -> nx.Graph:
     """ Removes all the edges of G wich doesn't respect the angle criterion.
         
         Parameters
@@ -128,8 +118,8 @@ def angle_criterion_enhanced(G: nx.Graph, pos: dict, angle_range: dict = {'1': 4
             A Networkx Graph graph.
         pos : dict
             The position of G's nodes.
-        min_angle : int (default=30)
-            The minimum accepted angle between two neighbours.
+        params : dict<dict>
+            ??? .
 
         Returns
         -------
@@ -151,17 +141,7 @@ def angle_criterion_enhanced(G: nx.Graph, pos: dict, angle_range: dict = {'1': 4
         #     min_angle = angle_range['<1->0.6']
         # elif((cityness_proba[node] <= 0.6) and (cityness_proba[node] > 0)):
         #     min_angle = angle_range['<=0.6->0']
-
-        if(mean_distances[node] <= 1.0):
-            min_angle = 40
-        elif((mean_distances[node] > 1) and (mean_distances[node] <= 2)):
-            min_angle = 30
-        elif((mean_distances[node] > 2) and (mean_distances[node] <= 5)):
-            min_angle = 25
-        elif((mean_distances[node] > 5) and (mean_distances[node] <= 10)):
-            min_angle = 15
-        else:
-            min_angle = 10
+        min_angle = mean_distance_choice(node, mean_distances, params, 'distance')
 
         neighbours = [edge[1] for edge in modif_G.edges(node)]
         angles = compute_angles(node, neighbours, pos)
