@@ -200,10 +200,24 @@ def mean_distance_to_NN(coordsXY: list, n_neighbours: int = 4) -> pd.Series:
         mean_distances : pd.Series
             A Series containing the mean_distances to base stations' nearest neighbours.
     """
-    nbrs = NearestNeighbors(n_neighbors=n_neighbours+1, metric=lambda x, y : distance.distance(x[::-1], y[::-1]).km).fit(coordsXY)  # n_neighbors+1 because considering himself
+    nbrs = NearestNeighbors(n_neighbors=n_neighbours+1, metric='euclidean').fit(coordsXY)  # n_neighbors+1 because considering himself
+    #lambda x, y : distance.distance(x[::-1], y[::-1]).km # we use this because less time and precision overall global
     distances, _ = nbrs.kneighbors(coordsXY)
     
-    mean_distances = np.mean(distances[:, 1:], axis=1)  # we exclude the first element (distance to ourself is 0)
+    mean_distances = np.mean(distances[:, 1:]/1000, axis=1)  # we exclude the first element (distance to ourself is 0)
 
     return pd.Series(data=mean_distances, index=coordsXY.index)
+
+def mean_distance_choice(node: int, mean_distances: pd.Series, mean_distance_params: dict, param: str):
+    values = [elem[param] for elem in mean_distance_params.values()]
+    if(mean_distances[node] <= 1.0):
+        return values[0]
+    elif((mean_distances[node] > 1) and (mean_distances[node] <= 2)):
+        return values[1]
+    elif((mean_distances[node] > 2) and (mean_distances[node] <= 5)):
+        return values[2]
+    elif((mean_distances[node] > 5) and (mean_distances[node] <= 10)):
+        return values[3]
+    else:
+        return values[4]
     
