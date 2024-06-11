@@ -214,10 +214,8 @@ def mean_distance_choice(node: int, mean_distances: pd.Series, mean_distance_par
         return values[0]
     elif((mean_distances[node] > 1) and (mean_distances[node] <= 2)):
         return values[1]
-    elif((mean_distances[node] > 2) and (mean_distances[node] <= 5)):
+    elif((mean_distances[node] > 2) and (mean_distances[node] <= 4)):
         return values[2]
-    elif((mean_distances[node] > 5) and (mean_distances[node] <= 10)):
-        return values[3]
     else:
-        return values[4]
+        return values[3]
     
