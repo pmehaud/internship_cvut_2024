@@ -2,6 +2,8 @@ import pandas as pd
 from sklearn.cluster import HDBSCAN
 from sklearn.cluster import DBSCAN
 import numpy as np
+import folium.features
+
 
 def city_detection_enhanced(coordsXY: list) -> pd.Series:
     """ Computes the probability of base stations' city-ness using H-DBScan.
@@ -55,3 +57,20 @@ def city_comparison(labels1, labels2):
     c = np.sum((l1 != -1) & (l2 == -1))/nb
     d = np.sum((l1 != -1) & (l2 != -1))/nb
     return (a,b,c,d)
+
+def plotMapWithColors(df, countryside, colors, title):
+    map = folium.Map(location=np.mean(df[['latitude','longitude']], axis=0), zoom_start=7, tiles="Cartodb Positron")
+    points = folium.FeatureGroup(f"Points").add_to(map)
+
+    for bs_id, latitude, longitude in df[['latitude', 'longitude']].itertuples():
+        if(bs_id in countryside):
+            color = colors[bs_id]
+            points.add_child(folium.CircleMarker(location=[latitude, longitude], color=color, radius=1))
+        # else:
+        #     color = mean_distance_choice(bs_id, mean_distances, mean_distance_params, 'colour')
+        #     points.add_child(folium.CircleMarker(location=[latitude, longitude], color=color, radius=1))
+
+    folium.LayerControl().add_to(map)
+
+    map.save(f"../../out/maps/{title}.html")
+    return map
