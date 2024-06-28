@@ -30,7 +30,7 @@ def plotMapWithColorsAndLayers(df, countryside, colors, title, linearModels, xBo
         if (clustId != -1):
             xBound = xBounds[clustId]
             x = np.linspace(xBound[0], xBound[1], 100)
-            pr = PolynomialFeatures(degree = 20)
+            pr = PolynomialFeatures(degree = len(linearModels[clustId].coef_[0])-1)
             X_poly = pr.fit_transform(x.reshape(-1, 1))
             y = linearModels[clustId].predict(X_poly)
 
@@ -40,7 +40,7 @@ def plotMapWithColorsAndLayers(df, countryside, colors, title, linearModels, xBo
             transformer = Transformer.from_crs("epsg:2154", "epsg:4326")
             latitudes, longitudes = transformer.transform(x, y)
 
-            layers.get(clustId).add_child(folium.PolyLine(list(zip(latitudes, longitudes)), color='black'))
+            layers.get(clustId).add_child(folium.PolyLine(list(zip(latitudes, longitudes)), color='black', popup=f"id du cluster : {clustId}"))
 
 
     folium.LayerControl().add_to(map)
@@ -56,10 +56,10 @@ def road_get_clust_hdbscan(df_extracted, countryside):
     return clust_hdbscan
 
 def road_get_clust_dbscan(df_extracted, countryside):
-    return  pd.Series(DBSCAN(eps=4500, min_samples=4).fit(df_extracted[['x','y']].loc[countryside]).labels_, index = countryside)
+    return  pd.Series(DBSCAN(eps=6000, min_samples=6).fit(df_extracted[['x','y']].loc[countryside]).labels_, index = countryside)
 
 def road_get_clust_optics(df_extracted, countryside):
-    return pd.Series(OPTICS(max_eps=4500, min_samples=4).fit(df_extracted[['x','y']].loc[countryside]).labels_, index = countryside)
+    return pd.Series(OPTICS(max_eps=20000, min_samples=6).fit(df_extracted[['x','y']].loc[countryside]).labels_, index = countryside)
 
 def detect_roads_based_on_clusters(clusters, df_extracted):
     excluded_clusters = []
@@ -69,7 +69,7 @@ def detect_roads_based_on_clusters(clusters, df_extracted):
         if (clustId != -1):
             clust = df_extracted.loc[clusters[clusters == clustId].index]
             if (len(clust)>0):
-                pr = PolynomialFeatures(degree = 20)
+                pr = PolynomialFeatures(degree = 10)
                 X_poly = pr.fit_transform(clust[['x']])
                 lr_2 = LinearRegression()
                 lr_2.fit(X_poly, clust[['y']])
