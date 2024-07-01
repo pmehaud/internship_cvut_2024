@@ -13,7 +13,7 @@ def extract_data(df, provider=None, techno=None, department=None, region=None, m
     res = deepcopy(df)
 
     if(min_info):
-        res = res[['nom_op', 'num_site', 'x', 'y', 'latitude', 'longitude', 'nom_reg', 'nom_dep', 'nom_com', 'site_2g', 'site_3g', 'site_4g', 'site_5g']]
+        res = res[['id_station_anfr', 'nom_op', 'x', 'y', 'latitude', 'longitude', 'nom_reg', 'nom_dep', 'nom_com', 'site_2g', 'site_3g', 'site_4g', 'site_5g']]
     if(provider):
         res = res.loc[res['nom_op'] == provider]
         res = res.drop(columns=['nom_op'])
