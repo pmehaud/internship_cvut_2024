@@ -13,7 +13,7 @@ import seaborn as sns
 import branca
 
 
-def plotMapWithColorsAndLayers(df, countryside, colors, title, linearModels, xBounds, clusters, layersContent, layersLabel, mapName = "Cartodb Positron"):
+def plotMapWithColorsAndLayers(df, countryside, colors, linearModels, xBounds, clusters, layersContent, layersLabel, mapName = "Cartodb Positron"):
     map = folium.Map(location=np.mean(df[['latitude','longitude']], axis=0), zoom_start=7, tiles=mapName)
     layers = [folium.FeatureGroup(layerLabel) for layerLabel in layersLabel]
     for layer in layers : layer.add_to(map)
@@ -45,7 +45,6 @@ def plotMapWithColorsAndLayers(df, countryside, colors, title, linearModels, xBo
 
     folium.LayerControl().add_to(map)
 
-    map.save(f"../../out/maps/{title}.html")
     return map
 
 def road_get_clust_hdbscan(df_extracted, countryside):
@@ -78,7 +77,7 @@ def detect_roads_based_on_clusters(clusters, df_extracted):
                 x = clust['x'].values
 
                 xBounds[clustId] = (np.min(x), np.max(x))
-                if (lr_2.score(X_poly, clust[['y']]) < 0.2 ):
+                if (lr_2.score(X_poly, clust[['y']]) < 0.15 ):
                     excluded_clusters.append(clustId)
     not_exluded_clusters = [clustId for clustId in clusters if clustId not in excluded_clusters and clustId != -1 ]
     return (excluded_clusters, not_exluded_clusters, linearModels, xBounds)
