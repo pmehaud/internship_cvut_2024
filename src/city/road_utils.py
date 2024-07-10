@@ -12,6 +12,7 @@ from pyproj import Transformer
 import seaborn as sns
 import branca
 
+from useful_methods.neighbours_delaunay.miscellaneous_for_neighbouring import mean_distance_to_NN
 
 def plotMapWithColorsAndLayers(df, countryside, colors, linearModels, xBounds, clusters, layersContent, layersLabel, mapName = "Cartodb Positron"):
     map = folium.Map(location=np.mean(df[['latitude','longitude']], axis=0), zoom_start=7, tiles=mapName)
@@ -81,3 +82,28 @@ def detect_roads_based_on_clusters(clusters, df_extracted):
                     excluded_clusters.append(clustId)
     not_exluded_clusters = [clustId for clustId in clusters if clustId not in excluded_clusters and clustId != -1 ]
     return (excluded_clusters, not_exluded_clusters, linearModels, xBounds)
+
+
+def road_candidates(df_extracted):
+    mean_distances = mean_distance_to_NN(df_extracted[['x', 'y']], n_neighbours=3) # 3 to have more neighbours
+    countryside = []
+    for station in mean_distances.index:
+        if(mean_distances[station]>2):
+            countryside.append(station)
+
+    clust_dbscan = pd.Series(DBSCAN(eps=4500, min_samples=4).fit(df_extracted[['x','y']].loc[countryside]).labels_, index = countryside)
+    clust_hdbscan = pd.Series(HDBSCAN(cluster_selection_epsilon=4500, min_cluster_size=2, min_samples=2, alpha=75).fit(df_extracted[['x','y']].loc[countryside]).labels_, index = countryside)
+    clust_optics = pd.Series(OPTICS(max_eps=4500, min_samples=4).fit(df_extracted[['x','y']].loc[countryside]).labels_, index = countryside)
+
+    for clustering in [clust_dbscan, clust_hdbscan, clust_optics]:
+        for cluster in clustering.loc[clustering!=-1].unique():
+            nb_elem = list(clustering).count(cluster)
+            if(nb_elem <= 10):
+                clustering.loc[clustering==cluster] = -1
+
+    possible_points = []
+    for bsId in countryside:
+        if((clust_dbscan[bsId]!=-1) or (clust_dbscan[bsId]!=-1) or (clust_dbscan[bsId]!=-1)):
+            possible_points.append(bsId)
+    
+    return possible_points
