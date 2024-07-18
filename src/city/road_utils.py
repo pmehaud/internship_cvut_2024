@@ -102,8 +102,23 @@ def road_candidates(df_extracted):
                 clustering.loc[clustering==cluster] = -1
 
     possible_points = []
-    for bsId in countryside:
-        if((clust_dbscan[bsId]!=-1) or (clust_dbscan[bsId]!=-1) or (clust_dbscan[bsId]!=-1)):
+    for bsId in df_extracted.index:
+        if (bsId not in countryside):
+            possible_points.append(bsId)
+        elif((clust_dbscan[bsId]!=-1) or (clust_dbscan[bsId]!=-1) or (clust_dbscan[bsId]!=-1)):
             possible_points.append(bsId)
     
     return possible_points
+
+def distance_to_segment(A, B, C):
+    A = np.array(A)
+    B = np.array(B)
+    C = np.array(C)
+    
+    P = A + (np.dot(B-A, C-A))/(np.linalg.norm(B-A)**2) * (B-A)
+    
+    k = np.dot(B-A, P-A) / np.linalg.norm(B-A)**2
+
+    dist = np.linalg.norm(P-C) if ((k >= 0) and (k <= 1)) else np.inf
+    
+    return dist, P
