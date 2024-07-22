@@ -23,27 +23,27 @@ def delaunay_graph(df: DataFrame) -> tuple[nx.Graph, dict]:
 
         Returns
         -------
-        G : Graph
+        del_G : Graph
             A Networkx Graph graph.
         pos : dict
-            The position of G's nodes.
+            The position of del_G's nodes.
     """
     points_pos = df[['latitude', 'longitude']].values
 
     delaunay_triangulation = Delaunay(points_pos)
 
-    G = nx.Graph()
+    del_G = nx.Graph()
     nodes = range(len(delaunay_triangulation.points))
-    G.add_nodes_from(nodes)
+    del_G.add_nodes_from(nodes)
 
     for simplex in delaunay_triangulation.simplices:
-        G.add_edges_from(combinations(simplex, 2))
+        del_G.add_edges_from(combinations(simplex, 2))
 
-    G = nx.relabel_nodes(G, dict(zip(nodes, df.index))) # renaming nodes according to the indexes of the dataframe
+    del_G = nx.relabel_nodes(del_G, dict(zip(nodes, df.index))) # renaming nodes according to the indexes of the dataframe
 
     pos = dict(zip(df.index, points_pos)) # gives each node his own position
 
-    return G, pos
+    return del_G, pos
 
 #=================================================================#
 # Creation of the gabriel graph based on a delaunay triangulation #
@@ -59,16 +59,16 @@ def gabriel_graph(df: DataFrame) -> tuple[nx.Graph, dict]:
 
         Returns
         -------
-        G : Graph
+        gab_G : Graph
             A Gabriel Graph.
         pos : dict
-            The position of G's nodes.
+            The position of gab_G's nodes.
     """
-    G, pos = delaunay_graph(df)
+    gab_G, pos = delaunay_graph(df)
 
     coordsXY = df[['x','y']]
 
-    for edge in G.edges:
+    for edge in gab_G.edges:
         pt1 = edge[0]
         pt2 = edge[1]
 
@@ -78,6 +78,6 @@ def gabriel_graph(df: DataFrame) -> tuple[nx.Graph, dict]:
         neigh.fit(coordsXY)
 
         if(len(coordsXY.iloc[neigh.radius_neighbors([middle_point], sort_results=True)[1][0][:-2]].index)>0):
-            G.remove_edges_from([edge])
+            gab_G.remove_edges_from([edge])
 
-    return G, pos
+    return gab_G, pos
