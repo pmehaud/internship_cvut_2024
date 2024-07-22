@@ -6,7 +6,6 @@ import numpy as np # type: ignore
 from geopy import distance # type: ignore
 import pandas as pd # type: ignore
 import networkx as nx # type: ignore
-from sklearn.neighbors import NearestNeighbors # type: ignore
 import math
 
 #=================#
@@ -183,39 +182,4 @@ def angle_elim(G: nx.Graph, pos: dict, ref_point: int, adj: list, id: int, next_
     if(km_distance(pos[ref_point], pos[adj[id]]) > km_distance(pos[ref_point], pos[adj[next_id]])):
         G.remove_edges_from([(ref_point, adj[id])])
     else:
-        G.remove_edges_from([(ref_point, adj[next_id])])
-
-def mean_distance_to_NN(coordsXY: list, n_neighbours: int = 4) -> pd.Series:
-    """ Computes the mean distance to the n_neighbours.
-        
-        Parameters
-        ----------
-        coordsXY : list
-            [x, y] coordinates of all points (lambert-93 projection).
-        n_neighbours : int (default=4)
-            Number of nearest neighbours.
-
-        Returns
-        -------
-        mean_distances : pd.Series
-            A Series containing the mean_distances to base stations' nearest neighbours.
-    """
-    nbrs = NearestNeighbors(n_neighbors=n_neighbours+1, metric='euclidean').fit(coordsXY)  # n_neighbors+1 because considering himself
-    #lambda x, y : distance.distance(x[::-1], y[::-1]).km # we use this because less time and precision overall global
-    distances, _ = nbrs.kneighbors(coordsXY)
-    
-    mean_distances = np.mean(distances[:, 1:]/1000, axis=1)  # we exclude the first element (distance to ourself is 0)
-
-    return pd.Series(data=mean_distances, index=coordsXY.index)
-
-def mean_distance_choice(node: int, mean_distances: pd.Series, mean_distance_params: dict, param: str):
-    values = [elem[param] for elem in mean_distance_params.values()]
-    if(mean_distances[node] <= 1.0):
-        return values[0]
-    elif((mean_distances[node] > 1) and (mean_distances[node] <= 2)):
-        return values[1]
-    elif((mean_distances[node] > 2) and (mean_distances[node] <= 4)):
-        return values[2]
-    else:
-        return values[3]
-    
+        G.remove_edges_from([(ref_point, adj[next_id])])   

@@ -12,7 +12,7 @@ from pyproj import Transformer
 import seaborn as sns
 import branca
 
-from useful_methods.neighbours_delaunay.miscellaneous_for_neighbouring import mean_distance_to_NN
+from python_scripts.city.city_utils import mean_distance_to_NN
 
 def plotMapWithColorsAndLayers(df, countryside, colors, linearModels, xBounds, clusters, layersContent, layersLabel, mapName = "Cartodb Positron"):
     map = folium.Map(location=np.mean(df[['latitude','longitude']], axis=0), zoom_start=7, tiles=mapName)

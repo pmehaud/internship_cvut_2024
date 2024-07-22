@@ -17,7 +17,7 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 # Add the directory of 'city' to the sys.path
 sys.path.append(os.path.join(current_dir, 'city'))
 from .miscellaneous_for_neighbouring import *
-from city.city_utils import city_detection_enhanced
+from python_scripts.city.city_utils import city_detection_enhanced
     
 
 def distance_elim(G, pos, edge, max_distance):
