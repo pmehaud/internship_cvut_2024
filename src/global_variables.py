@@ -1,0 +1,12 @@
+# Parameters for criteria using 3NN method (angle in degrees and distance in kilometer)
+
+MEAN_DISTANCE_PARAMS = {
+    ']0, 1] km': {'colour': '#030464', 'min_angle': 40, 'max_distance': 2},
+    ']1, 2] km': {'colour': '#069AF3', 'min_angle': 30, 'max_distance': 5},
+    ']2, 4] km': {'colour': '#02D4BB', 'min_angle': 20, 'max_distance': 10},
+    ']4, inf] km': {'colour': '#0DBF75', 'min_angle': 20, 'max_distance': 15},
+}
+
+# Number of neighbours in the kNN city detection method
+
+N_NEIGH = 3
