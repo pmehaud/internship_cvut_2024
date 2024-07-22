@@ -24,7 +24,7 @@ def delaunay_graph(df: DataFrame) -> tuple[nx.Graph, dict]:
         Returns
         -------
         del_G : Graph
-            A Networkx Graph graph.
+            A Delaunay triangulation graph.
         pos : dict
             The position of del_G's nodes.
     """
