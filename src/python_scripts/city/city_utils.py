@@ -95,7 +95,7 @@ def mean_distance_to_NN(coordsXY: list, n_neighbours: int = 4) -> pd.Series:
     #lambda x, y : distance.distance(x[::-1], y[::-1]).km # we use this because less time and precision overall global
     distances, _ = nbrs.kneighbors(coordsXY)
     
-    mean_distances = np.mean(distances[:, 1:]/1000, axis=1)  # we exclude the first element (distance to ourself is 0)
+    mean_distances = np.round(np.mean(distances[:, 1:]/1000, axis=1), decimals=3) # we exclude the first element (distance to ourself is 0) and round to 3 decimals to be 1-meter precise
 
     return pd.Series(data=mean_distances, index=coordsXY.index)
 
