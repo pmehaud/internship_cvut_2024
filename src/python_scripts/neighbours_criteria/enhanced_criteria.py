@@ -64,7 +64,7 @@ def distance_criterion_enhanced(G: nx.Graph, pos: dict, params: dict, **kwargs) 
         #     max_distance = distance_range['<1->0.6']
         # elif((cityness_proba[node] <= 0.6) and (cityness_proba[node] > 0)):
         #     max_distance = distance_range['<=0.6->0']
-        max_distance = mean_distance_choice(node, mean_distances, params, 'distance')
+        max_distance = mean_distance_choice(node, mean_distances, params, 'max_distance')
         
         for edge in G.edges(node):
             if(km_distance(pos[edge[0]],pos[edge[1]]) > max_distance):
@@ -141,7 +141,7 @@ def angle_criterion_enhanced(G: nx.Graph, pos: dict, params: dict, **kwargs) -> 
         #     min_angle = angle_range['<1->0.6']
         # elif((cityness_proba[node] <= 0.6) and (cityness_proba[node] > 0)):
         #     min_angle = angle_range['<=0.6->0']
-        min_angle = mean_distance_choice(node, mean_distances, params, 'distance')
+        min_angle = mean_distance_choice(node, mean_distances, params, 'min_angle')
 
         neighbours = [edge[1] for edge in modif_G.edges(node)]
         angles = compute_angles(node, neighbours, pos)
