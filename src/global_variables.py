@@ -1,5 +1,4 @@
 # Parameters for criteria using 3NN method (angle in degrees and distance in kilometer)
-
 MEAN_DISTANCE_PARAMS = {
     ']0, 1] km': {'colour': '#030464', 'min_angle': 40, 'max_distance': 2},
     ']1, 2] km': {'colour': '#069AF3', 'min_angle': 30, 'max_distance': 5},
@@ -8,5 +7,9 @@ MEAN_DISTANCE_PARAMS = {
 }
 
 # Number of neighbours in the kNN city detection method
-
 N_NEIGH = 3
+
+# Informations for data extraction
+PROVIDER = 'Orange'
+TECHNO='4g'
+REGION='Normandie'
