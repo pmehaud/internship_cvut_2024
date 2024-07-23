@@ -93,7 +93,7 @@ def kNN_graph(df: DataFrame, k: int = 15) -> tuple[nx.Graph, dict]:
         ----------
         df : DataFrame
             The pandas DataFrame of your data.
-        k : int
+        k : int (default=15)
             The number of neighbours kept for creating the graph.
 
         Returns
