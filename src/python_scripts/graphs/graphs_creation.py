@@ -81,3 +81,47 @@ def gabriel_graph(df: DataFrame) -> tuple[nx.Graph, dict]:
             gab_G.remove_edges_from([edge])
 
     return gab_G, pos
+
+#==============================================#
+# Creation of a graph based on the k-NN method #
+#==============================================#
+
+def kNN_graph(df: DataFrame, k: int = 15) -> tuple[nx.Graph, dict]:
+    """ Returns a graph based on the k-NN method and the position of each node.
+        
+        Parameters
+        ----------
+        df : DataFrame
+            The pandas DataFrame of your data.
+        k : int
+            The number of neighbours kept for creating the graph.
+
+        Returns
+        -------
+        kNN_G : Graph
+            A k-NN-based Graph.
+        pos : dict
+            The position of kNN_G's nodes.
+    """
+    kNN_G = nx.Graph()
+    nodes = df.index
+    kNN_G.add_nodes_from(nodes)
+
+    coordsXY = df[['x', 'y']]
+
+    nbrs = NearestNeighbors(n_neighbors=k+1).fit(coordsXY) # +1 for taking in account the bs
+    neighs = nbrs.kneighbors(coordsXY, return_distance=False)
+
+    for row in range(len(neighs)):
+        for col in range(len(neighs[row])):
+            neighs[row, col] = coordsXY.index[neighs[row, col]]
+
+    for row in neighs:
+        bs_id = row[0]
+        for bs_id_neigh in row[1:]:
+            edge = [bs_id, bs_id_neigh]
+            kNN_G.add_edges_from([edge])
+
+    pos = dict(zip(nodes, df[['latitude', 'longitude']].values)) # gives each node his own position
+
+    return kNN_G, pos
