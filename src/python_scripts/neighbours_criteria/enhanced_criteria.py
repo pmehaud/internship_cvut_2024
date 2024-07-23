@@ -7,22 +7,9 @@ import numpy as np # type: ignore
 import pandas as pd # type: ignore
 from tqdm import tqdm # progression bar # type: ignore
 from copy import deepcopy
-import math
-import os
-import sys
 
-# Get the current directory of the file
-current_dir = os.path.dirname(os.path.abspath(__file__))
-
-# Add the directory of 'city' to the sys.path
-sys.path.append(os.path.join(current_dir, 'city'))
 from .miscellaneous_for_neighbouring import *
-from python_scripts.city.city_utils import city_detection_enhanced, mean_distance_to_NN, mean_distance_choice
-    
-
-def distance_elim(G, pos, edge, max_distance):
-    if(km_distance(pos[edge[0]],pos[edge[1]]) > max_distance):
-        G.remove_edges_from([edge])
+from python_scripts.city.city_utils import mean_distance_to_NN, mean_distance_choice
 
 #==========#
 # Criteria #
