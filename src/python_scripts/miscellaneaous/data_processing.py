@@ -2,14 +2,30 @@
 # Libraries importation #
 #=======================#
 
-import pandas as pd # type: ignore
+from pandas import DataFrame
 from copy import deepcopy
 
 #==================================#
 # Extracting data from a dataframe #
 #==================================#
 
-def extract_data(df, provider=None, techno=None, department=None, region=None, min_info=True):
+def extract_data(df: DataFrame, provider: str = None, techno: str = None, department: str = None, region: str = None, min_info: bool = True) -> DataFrame:
+    """ Extracts data from a pandas DataFrame.
+        
+        Parameters
+        ----------
+        df : DataFrame
+            The pandas DataFrame of your data.
+        provider, techno, department, region : str
+            The fields you want to select according to df.
+        min_info : bool (default=True)
+            True if you want to keep only the essential.
+            
+        Returns
+        -------
+        res : DataFrame
+            The extracted data you asked for.
+    """
     res = deepcopy(df)
 
     if(min_info):
