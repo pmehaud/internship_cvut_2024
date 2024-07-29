@@ -50,7 +50,7 @@ def compute_angles(ref_point: int, adj: list, pos: dict) -> np.array:
         y_neighbour = pos[neighbour][1]
 
         angles.append(np.degrees(np.arctan2(y_neighbour - pos[ref_point][1], x_neighbour - pos[ref_point][0])))
-    angles = [round((k + 360) % 360) for k in angles]
+    angles = [np.round((k + 360) % 360, decimals=2) for k in angles]
 
     return np.array(angles)
 
