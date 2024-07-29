@@ -75,7 +75,7 @@ def gabriel_graph(df: DataFrame) -> tuple[nx.Graph, dict]:
         middle_point = (coordsXY.loc[pt1] + coordsXY.loc[pt2])/2
 
         neigh = NearestNeighbors(radius=sqrt(sum((coordsXY.loc[pt1] - coordsXY.loc[pt2])**2, axis=0))/2)
-        neigh.fit(coordsXY)
+        neigh.fit(coordsXY.values)
 
         if(len(coordsXY.iloc[neigh.radius_neighbors([middle_point], sort_results=True)[1][0][:-2]].index)>0):
             gab_G.remove_edges_from([edge])
