@@ -7,7 +7,7 @@ from pandas import DataFrame
 from scipy.spatial import Delaunay # type: ignore
 from itertools import combinations
 from sklearn.neighbors import NearestNeighbors
-from numpy import sqrt, sum
+import numpy as np
 
 #=======================================================#
 # Creation of a graph based on a delaunay triangulation #
@@ -74,7 +74,7 @@ def gabriel_graph(df: DataFrame) -> tuple[nx.Graph, dict]:
 
         middle_point = (coordsXY.loc[pt1] + coordsXY.loc[pt2])/2
 
-        neigh = NearestNeighbors(radius=sqrt(sum((coordsXY.loc[pt1] - coordsXY.loc[pt2])**2, axis=0))/2)
+        neigh = NearestNeighbors(radius=np.sqrt(np.sum((coordsXY.loc[pt1] - coordsXY.loc[pt2])**2, axis=0))/2)
         neigh.fit(coordsXY.values)
 
         if(len(coordsXY.iloc[neigh.radius_neighbors([middle_point], sort_results=True)[1][0][:-2]].index)>0):
@@ -110,11 +110,12 @@ def kNN_graph(df: DataFrame, k: int = 15) -> tuple[nx.Graph, dict]:
     coordsXY = df[['x', 'y']]
 
     nbrs = NearestNeighbors(n_neighbors=k+1).fit(coordsXY) # +1 for taking in account the bs
-    neighs = nbrs.kneighbors(coordsXY, return_distance=False)
+    kNN_neighs = nbrs.kneighbors(coordsXY, return_distance=False)
 
-    for row in range(len(neighs)):
-        for col in range(len(neighs[row])):
-            neighs[row, col] = coordsXY.index[neighs[row, col]]
+    neighs = np.array([[None] * (k+1) for i in range(len(kNN_neighs))])
+    for row in range(len(kNN_neighs)):
+        for col in range(k+1):
+            neighs[row, col] = coordsXY.index[kNN_neighs[row, col]]
 
     for row in neighs:
         bs_id = row[0]
