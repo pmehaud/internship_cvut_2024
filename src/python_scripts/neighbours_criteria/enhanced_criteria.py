@@ -15,7 +15,7 @@ from python_scripts.city.city_utils import mean_distance_to_NN, mean_distance_ch
 # Criteria #
 #==========#
 
-def distance_criterion_enhanced(G: nx.Graph, pos: dict, params: dict, **kwargs) -> nx.Graph:
+def distance_criterion_enhanced(G: nx.Graph, pos: dict, params: dict, mean_distances: pd.Series, **kwargs) -> nx.Graph:
     """ Removes all the edges of G wich are longer than the distance_range.
         
         Parameters
@@ -32,10 +32,6 @@ def distance_criterion_enhanced(G: nx.Graph, pos: dict, params: dict, **kwargs) 
         modif_G : Graph
             The modified graph.
     """
-    mean_distances = kwargs.get('mean_distance_to_NN', None)
-    if(mean_distances is None):
-       mean_distances = mean_distance_to_NN(pd.DataFrame(data=pos.values(), columns=['lat','long'], index=pos.keys()))
-    
     modif_G = deepcopy(G)
     
     for bs_id in tqdm(pos.keys(), desc="nodes - distance"):
@@ -49,7 +45,7 @@ def distance_criterion_enhanced(G: nx.Graph, pos: dict, params: dict, **kwargs) 
 
     return modif_G
 
-def quadrant_criterion_enhanced(G: nx.Graph, pos: dict, params: dict, k_nn: int = 1, **kwargs) -> nx.Graph:
+def quadrant_criterion_enhanced(G: nx.Graph, pos: dict, params: dict, mean_distances: pd.Series, k_nn: int = 1, **kwargs) -> nx.Graph:
     """ Removes all the edges of G wich doesn't respect the quadrant criterion.
         
         Parameters
@@ -86,7 +82,46 @@ def quadrant_criterion_enhanced(G: nx.Graph, pos: dict, params: dict, k_nn: int 
 
     return modif_G
 
-def angle_criterion_enhanced(G: nx.Graph, pos: dict, params: dict, **kwargs) -> nx.Graph:
+def quadrant_criterion_enhanced_v2(G: nx.Graph, pos: dict, params: dict, mean_distances: pd.Series, k_nn: int = 1, **kwargs) -> nx.Graph:
+    """ Removes all the edges of G wich doesn't respect the quadrant criterion v2.
+        
+        Parameters
+        ----------
+        G : Graph
+            A Networkx Graph graph.
+        pos : dict
+            The position of G's nodes.
+        k_nn: int
+            How much neighbours you want to keep per quadrant.
+
+        Returns
+        -------
+        modif_G : Graph
+            The modified graph.
+    """
+    df_az = kwargs.get('df_azimuth', None)
+
+    modif_G = deepcopy(G)
+
+    for bs_id in tqdm(pos.keys(), desc="nodes - quadrant"):
+        neighbours = [edge[1] for edge in modif_G.edges(bs_id)]
+        edges_to_remove = list(modif_G.edges(bs_id))
+        quadrants = create_azimuth_quadrants(bs_id, neighbours, pos, np.unique(df_az.loc[df_az['id_station_anfr']==bs_id,'angle_azimuth']))
+
+        nb_neighbours = 0
+        while(nb_neighbours < k_nn):
+            for quad in quadrants.values():
+                nearest_neighbour = nearestNeighbour(bs_id, quad, pos)
+                if((nearest_neighbour != bs_id) and ((bs_id, nearest_neighbour) in edges_to_remove)):
+                    edges_to_remove.remove((bs_id, nearest_neighbour)) # removing the nearest neighbour in the quadrant centered on bs_id from the edges to remove
+                    quad.remove(nearest_neighbour)
+            nb_neighbours += 1
+        
+        modif_G.remove_edges_from(edges_to_remove)
+
+    return modif_G
+
+def angle_criterion_enhanced(G: nx.Graph, pos: dict, params: dict, mean_distances: pd.Series, **kwargs) -> nx.Graph:
     """ Removes all the edges of G wich doesn't respect the angle criterion.
         
         Parameters
@@ -103,10 +138,6 @@ def angle_criterion_enhanced(G: nx.Graph, pos: dict, params: dict, **kwargs) -> 
         modif_G : Graph
             The modified graph.
     """
-    mean_distances = kwargs.get('mean_distance_to_NN', None)
-    if(mean_distances is None):
-       mean_distances = mean_distance_to_NN(pd.DataFrame(data=pos.values(), columns=['lat','long'], index=pos.keys()))
-    
     modif_G = deepcopy(G)
 
     for bs_id in tqdm(pos.keys(), desc="nodes - angles"):
