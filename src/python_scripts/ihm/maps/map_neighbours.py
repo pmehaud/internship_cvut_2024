@@ -27,10 +27,12 @@ def addLegend(map, labelsToColors):
     map.get_root().html.add_child(folium.Element(legend_html))
 
 def add_graph_edges(G_base: Graph, G: Graph, df: DataFrame, fg: folium.FeatureGroup, colour: str):
+    created_edges = []
     for edge in G_base.edges:
         stations = []
 
-        if(not(edge in G.edges)):
+        if((not(edge in created_edges)) and (not(edge in G.edges))):
+            created_edges.append(edge)
             stations.append(df.loc[edge[0], ['latitude', 'longitude']])
             stations.append(df.loc[edge[1], ['latitude', 'longitude']])
 
@@ -47,10 +49,10 @@ def create_method_illustation_map(df: DataFrame, base_graph: Graph, base_graph_n
     
     map = folium.Map(location=list(np.mean(df[['latitude','longitude']], axis=0)), zoom_start=8.5, tiles="Cartodb Positron")
 
-    edges_del = folium.FeatureGroup(f"Edges - {base_graph_name} ({len(base_graph.edges)})", show=True).add_to(map)
-    edges_tot = folium.FeatureGroup(f"Edges - neighbouring graph ({len(neigh_graph.edges)})", show=False).add_to(map)
-    add_graph_edges(base_graph, Graph(), df, edges_del, colour="lightblue")
-    add_graph_edges(neigh_graph, Graph(), df, edges_tot, colour="#AAA662")
+    edges_base = folium.FeatureGroup(f"Edges - {base_graph_name} ({len(base_graph.edges)})", show=True).add_to(map)
+    edges_neigh = folium.FeatureGroup(f"Edges - neighbouring graph ({len(neigh_graph.edges)})", show=False).add_to(map)
+    add_graph_edges(base_graph, Graph(), df, edges_base, colour="lightblue")
+    add_graph_edges(neigh_graph, Graph(), df, edges_neigh, colour="#AAA662")
 
     if(G_dis):
         edges_dis = folium.FeatureGroup(f"Edges - distance filtering ({len(G_dis.edges)})", show=False).add_to(map)
@@ -62,7 +64,7 @@ def create_method_illustation_map(df: DataFrame, base_graph: Graph, base_graph_n
         edges_qua = folium.FeatureGroup(f"Edges - quadrant filtering ({len(G_qua.edges)})", show=False).add_to(map)
         add_graph_edges(base_graph, G_qua, df, edges_qua, colour="green")
 
-    points = folium.FeatureGroup(f"Base stations ({len(base_graph)})").add_to(map)
+    points = folium.FeatureGroup(f"Base stations ({len(df)})").add_to(map)
 
     for ind, latitude, longitude in df[['latitude', 'longitude']].itertuples():
         popup_text = folium.Popup(

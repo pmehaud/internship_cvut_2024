@@ -8,9 +8,9 @@ import pandas as pd # type: ignore
 import networkx as nx # type: ignore
 import math
 
-#=================#
-# Helpful methods #
-#=================#
+#==================#
+# Useful functions #
+#==================#
 
 def km_distance(pt1: list, pt2: list) -> float:
     """ Computes the distance in km between pt1 and pt2.
@@ -50,7 +50,7 @@ def compute_angles(ref_point: int, adj: list, pos: dict) -> np.array:
         y_neighbour = pos[neighbour][1]
 
         angles.append(np.degrees(np.arctan2(y_neighbour - pos[ref_point][1], x_neighbour - pos[ref_point][0])))
-    angles = [round((k + 360) % 360) for k in angles]
+    angles = [np.round((k + 360) % 360, decimals=2) for k in angles]
 
     return np.array(angles)
 
@@ -103,6 +103,7 @@ def compute_distance_to_quadrant(ref_point: int, adj: list, pos: dict, angles: l
     quadrant_angles = [angle + gap for angle in range(0, 301, 60)]
     closest_quadrant_delimations = [quadrant_angles[np.argmin((np.abs((quadrant_angles-angle) % 360)))] for angle in angles]
     distances = [math.dist(pos[ref_point], pos[point]) * math.sin(abs(angle-quadrant_angle)) for angle, quadrant_angle, point in zip(angles, closest_quadrant_delimations, adj)]
+    
     return np.sum(distances)
 
 def create_6_quadrants_enhanced(ref_point: int, adj: list, pos: dict) -> dict:
@@ -162,6 +163,14 @@ def nearestNeighbour(ref_point: int, adj: list, pos: dict) -> int:
             nearestNeighbour = pt2
 
     return nearestNeighbour
+
+#=======================#
+# Criteria eliminations #
+#=======================#
+
+def distance_elim(G, pos, edge, max_distance):
+    if(km_distance(pos[edge[0]],pos[edge[1]]) > max_distance):
+        G.remove_edges_from([edge])
 
 def angle_elim(G: nx.Graph, pos: dict, ref_point: int, adj: list, id: int, next_id: int):
     """ Computes the angle elimination for angle criterion (keeps the nearest point).

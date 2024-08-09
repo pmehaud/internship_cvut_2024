@@ -7,22 +7,9 @@ import numpy as np # type: ignore
 import pandas as pd # type: ignore
 from tqdm import tqdm # progression bar # type: ignore
 from copy import deepcopy
-import math
-import os
-import sys
 
-# Get the current directory of the file
-current_dir = os.path.dirname(os.path.abspath(__file__))
-
-# Add the directory of 'city' to the sys.path
-sys.path.append(os.path.join(current_dir, 'city'))
 from .miscellaneous_for_neighbouring import *
-from python_scripts.city.city_utils import city_detection_enhanced, mean_distance_to_NN, mean_distance_choice
-    
-
-def distance_elim(G, pos, edge, max_distance):
-    if(km_distance(pos[edge[0]],pos[edge[1]]) > max_distance):
-        G.remove_edges_from([edge])
+from python_scripts.city.city_utils import mean_distance_to_NN, mean_distance_choice
 
 #==========#
 # Criteria #
@@ -51,16 +38,18 @@ def distance_criterion_enhanced(G: nx.Graph, pos: dict, params: dict, **kwargs) 
     
     modif_G = deepcopy(G)
     
-    for node in tqdm(pos.keys(), desc="nodes - distance"):
-        max_distance = mean_distance_choice(node, mean_distances, params, 'max_distance')
+    for bs_id in tqdm(pos.keys(), desc="nodes - distance"):
+        max_distance = mean_distance_choice(bs_id, mean_distances, params, 'max_distance')
         
-        for edge in G.edges(node):
-            if(km_distance(pos[edge[0]],pos[edge[1]]) > max_distance):
-                modif_G.remove_edges_from([edge])
+        for [_, neigh_id] in G.edges(bs_id):
+            dist = km_distance(pos[bs_id],pos[neigh_id])
+            neigh_max_distance = mean_distance_choice(neigh_id, mean_distances, params, 'max_distance')
+            if((dist > max_distance) and (dist > neigh_max_distance)):
+                modif_G.remove_edges_from([[bs_id, neigh_id]])
 
     return modif_G
 
-def quadrant_criterion_enhanced(G: nx.Graph, pos: dict, k_nn: int = 1) -> nx.Graph:
+def quadrant_criterion_enhanced(G: nx.Graph, pos: dict, params: dict, k_nn: int = 1, **kwargs) -> nx.Graph:
     """ Removes all the edges of G wich doesn't respect the quadrant criterion.
         
         Parameters
@@ -79,17 +68,17 @@ def quadrant_criterion_enhanced(G: nx.Graph, pos: dict, k_nn: int = 1) -> nx.Gra
     """
     modif_G = deepcopy(G)
 
-    for node in tqdm(pos.keys(), desc="nodes - quadrant"):
-        neighbours = [edge[1] for edge in modif_G.edges(node)]
-        edges_to_remove = list(modif_G.edges(node))
-        quadrants = create_6_quadrants_enhanced(node, neighbours, pos)
+    for bs_id in tqdm(pos.keys(), desc="nodes - quadrant"):
+        neighbours = [edge[1] for edge in modif_G.edges(bs_id)]
+        edges_to_remove = list(modif_G.edges(bs_id))
+        quadrants = create_6_quadrants_enhanced(bs_id, neighbours, pos)
 
         nb_neighbours = 0
         while(nb_neighbours < k_nn):
             for quad in quadrants.values():
-                nearest_neighbour = nearestNeighbour(node, quad, pos)
-                if(nearest_neighbour != node):
-                    edges_to_remove.remove((node, nearest_neighbour)) # removing the nearest neighbour in the quadrant centered on node from the edges to remove
+                nearest_neighbour = nearestNeighbour(bs_id, quad, pos)
+                if(nearest_neighbour != bs_id):
+                    edges_to_remove.remove((bs_id, nearest_neighbour)) # removing the nearest neighbour in the quadrant centered on bs_id from the edges to remove
                     quad.remove(nearest_neighbour)
             nb_neighbours += 1
         
@@ -120,23 +109,23 @@ def angle_criterion_enhanced(G: nx.Graph, pos: dict, params: dict, **kwargs) -> 
     
     modif_G = deepcopy(G)
 
-    for node in tqdm(pos.keys(), desc="nodes - angles"):
-        min_angle = mean_distance_choice(node, mean_distances, params, 'min_angle')
+    for bs_id in tqdm(pos.keys(), desc="nodes - angles"):
+        min_angle = mean_distance_choice(bs_id, mean_distances, params, 'min_angle')
 
-        neighbours = [edge[1] for edge in modif_G.edges(node)]
-        angles = compute_angles(node, neighbours, pos)
-        idx_angles = np.argsort(angles) # angle des voisins de node
+        neighbours = [edge[1] for edge in modif_G.edges(bs_id)]
+        angles = compute_angles(bs_id, neighbours, pos)
+        idx_angles = np.argsort(angles) # angles of bs_id's neighbours
 
         for i, id in enumerate(idx_angles):
             if(i < len(idx_angles) - 1):
                 next_id = idx_angles[i + 1]
                 if((angles[next_id] - angles[id]) <= min_angle):
-                    angle_elim(modif_G, pos, node, neighbours, id, next_id)
+                    angle_elim(modif_G, pos, bs_id, neighbours, id, next_id)
                 
         if(idx_angles.size!=0):
             next_id = idx_angles[-1]
             id = idx_angles[0]
             if((360 - angles[next_id] + angles[id]) <= min_angle):
-                angle_elim(modif_G, pos, node, neighbours, id, next_id)
+                angle_elim(modif_G, pos, bs_id, neighbours, id, next_id)
         
     return modif_G

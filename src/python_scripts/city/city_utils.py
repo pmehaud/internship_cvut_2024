@@ -76,12 +76,12 @@ def plotMapWithColors(df, countryside, colors, title):
     map.save(f"../../out/maps/{title}.html")
     return map
 
-def mean_distance_to_NN(coordsXY: list, n_neighbours: int = 4) -> pd.Series:
+def mean_distance_to_NN(coordsXY: pd.DataFrame, n_neighbours: int = 4) -> pd.Series:
     """ Computes the mean distance to the n_neighbours.
         
         Parameters
         ----------
-        coordsXY : list
+        coordsXY : DataFrame
             [x, y] coordinates of all points (lambert-93 projection).
         n_neighbours : int (default=4)
             Number of nearest neighbours.
@@ -92,7 +92,6 @@ def mean_distance_to_NN(coordsXY: list, n_neighbours: int = 4) -> pd.Series:
             A Series containing the mean_distances to base stations' nearest neighbours.
     """
     nbrs = NearestNeighbors(n_neighbors=n_neighbours+1, metric='euclidean').fit(coordsXY)  # n_neighbors+1 because considering himself
-    #lambda x, y : distance.distance(x[::-1], y[::-1]).km # we use this because less time and precision overall global
     distances, _ = nbrs.kneighbors(coordsXY)
     
     mean_distances = np.round(np.mean(distances[:, 1:]/1000, axis=1), decimals=3) # we exclude the first element (distance to ourself is 0) and round to 3 decimals to be 1-meter precise

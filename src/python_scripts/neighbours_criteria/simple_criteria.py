@@ -14,7 +14,7 @@ from .miscellaneous_for_neighbouring import *
 # Criteria #
 #==========#
 
-def distance_criterion(G: nx.Graph, pos: dict, max_distance: int = 15) -> nx.Graph:
+def distance_criterion(G: nx.Graph, pos: dict, max_distance: int, min_angle: int) -> nx.Graph:
     """ Removes all the edges of G wich are longer than max_distance.
         
         Parameters
@@ -32,13 +32,13 @@ def distance_criterion(G: nx.Graph, pos: dict, max_distance: int = 15) -> nx.Gra
             The modified graph.
     """
     modif_G = deepcopy(G)
-    for edge in tqdm(modif_G.edges, desc="edges"):
+    for edge in tqdm(modif_G.edges, desc="edges - distance"):
         if(km_distance(pos[edge[0]],pos[edge[1]]) > max_distance):
             modif_G.remove_edges_from([edge])
 
     return modif_G
 
-def quadrant_criterion(G: nx.Graph, pos: dict) -> nx.Graph:
+def quadrant_criterion(G: nx.Graph, pos: dict, max_distance: int, min_angle: int) -> nx.Graph:
     """ Removes all the edges of G wich doesn't respect the quadrant criterion.
         
         Parameters
@@ -54,7 +54,7 @@ def quadrant_criterion(G: nx.Graph, pos: dict) -> nx.Graph:
             The modified graph.
     """
     modif_G = deepcopy(G)
-    for node in tqdm(pos.keys(), desc="nodes"):
+    for node in tqdm(pos.keys(), desc="nodes - quadrant"):
         neighbours = [edge[1] for edge in modif_G.edges(node)]
         edges_to_remove = list(modif_G.edges(node))
         quadrants = create_6_quadrants(node, neighbours, pos)
@@ -68,7 +68,7 @@ def quadrant_criterion(G: nx.Graph, pos: dict) -> nx.Graph:
 
     return modif_G
 
-def angle_criterion(G: nx.Graph, pos: dict, min_angle: int = 30) -> nx.Graph:
+def angle_criterion(G: nx.Graph, pos: dict, max_distance: int, min_angle: int) -> nx.Graph:
     """ Removes all the edges of G wich doesn't respect the angle criterion.
         
         Parameters
@@ -87,7 +87,7 @@ def angle_criterion(G: nx.Graph, pos: dict, min_angle: int = 30) -> nx.Graph:
     """
     modif_G = deepcopy(G)
 
-    for node in tqdm(pos.keys(), desc="nodes"):
+    for node in tqdm(pos.keys(), desc="nodes - angle"):
         neighbours = [edge[1] for edge in modif_G.edges(node)]
         angles = compute_angles(node, neighbours, pos)
         idx_angles = np.argsort(angles) # angle des voisins de node
