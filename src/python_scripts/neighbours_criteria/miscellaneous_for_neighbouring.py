@@ -79,6 +79,44 @@ def create_6_quadrants(ref_point: int, adj: list, pos: dict) -> dict:
 
     return quadrants
 
+def create_azimuth_quadrants(ref_point: int, adj: list, pos: dict, azimuths: pd.Series) -> dict:
+    """ Creates 6 quadrants around ref_point.
+        
+        Parameters
+        ----------
+        ref_point : int
+            The reference of the central point.
+        adj : list
+            An array containing references of ref_point's adjacent nodes.
+        pos : dict
+            A dictionnary referencing all points' positions.
+
+        Returns
+        -------
+        quadrants : dict
+            A dictionnary referencing in which quadrant adj's point are.
+    """
+    angles = compute_angles(ref_point, adj, pos)
+
+    quadrants = dict()
+    nb_az = len(azimuths)
+
+    if(nb_az>0):
+        for id, az in enumerate(azimuths):
+            next_id = (id+1) % nb_az
+            next_az = azimuths[next_id]
+            biss = int(((((next_az - az) / 2) % 180) + az) % 360)
+            quadrants[f"{biss}_{next_az}"] = [adj[k] for k in np.where((angles >= biss) & (angles < next_az))[0]]
+            quadrants[f"{az}_{biss}"] = [adj[k] for k in np.where((angles >= az) & (angles < biss))[0]]
+
+    return quadrants
+
+# for az in azimuths:
+#     sup_angle = (az + semi_cover_angle) % 360
+#     inf_angle = (az - semi_cover_angle) % 360
+#     quadrants[f"{inf_angle}_{az}"] = [adj[k] for k in np.where((angles >= (inf_angle)) & (angles < az))[0]] # to have the real name of the node
+#     quadrants[f"{az}_{sup_angle}"] = [adj[k] for k in np.where((angles >= az) & (angles < (sup_angle)))[0]] # to have the real name of the node
+
 def compute_distance_to_quadrant(ref_point: int, adj: list, pos: dict, angles: list, gap: int) -> float:
     """ Computes the sum of the distances of each point to its closest quadrant edge.
         

@@ -30,7 +30,7 @@ def extract_data(df: DataFrame, provider: str = None, techno: str = None, depart
         df = df.drop(columns=['nom_op'])
     if(techno in ['2g', '3g', '4g', '5g']):
         df = df.loc[df[f"site_{techno}"] == 1]
-        df = df.drop(columns=[f"site_{techno}"])
+        # df = df.drop(columns=[f"site_{techno}"])
     if(department):
         df = df.loc[df['nom_dep'] == department]
         df = df.drop(columns=['nom_dep', 'nom_reg'])
